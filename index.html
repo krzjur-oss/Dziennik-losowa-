@@ -7,7 +7,6 @@
 <meta name="theme-color" content="#8b1a1a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Losowanie">
 <link rel="manifest" href="manifest.json">
 <style>
@@ -335,7 +334,8 @@ function buildClassView(cls) {
     banner = `<div class="queue-banner state-done">⚠️ Wszyscy uczniowie zostali już wylosowani! Naciśnij „Resetuj kolejkę" aby zacząć od nowa.</div>`;
   } else if (drawn.length > 0) {
     const next = remaining.slice(0,6).join(', ') + (remaining.length > 6 ? '…' : '');
-    banner = `<div class="queue-banner state-ok">🎲 Wylosowani: <b>${drawn.length}</b> z ${active.length} &nbsp;·&nbsp; Pozostało: <b>${remaining.length}</b><br>Jeszcze w puli: ${next}</div>`;
+    const lastInfo = remaining.length === 1 ? ' &nbsp;·&nbsp; <b>Ostatni numer!</b> Zostanie wylosowany jako pierwszy, drugi slot będzie pusty.' : '';
+    banner = `<div class="queue-banner state-ok">🎲 Wylosowani: <b>${drawn.length}</b> z ${active.length} &nbsp;·&nbsp; Pozostało: <b>${remaining.length}</b>${lastInfo}<br>Jeszcze w puli: ${next}</div>`;
   } else {
     banner = `<div class="queue-banner state-fresh">✓ Nowa runda — wszyscy <b>${active.length}</b> uczniowie z puli czekają na losowanie.</div>`;
   }
@@ -353,7 +353,7 @@ function buildClassView(cls) {
         </div>`;
       }).join('');
 
-  const canDraw = !exhausted && remaining.length >= 2;
+  const canDraw = !exhausted && remaining.length >= 1;
   const n1d = todayEntry ? todayEntry.n1 : '—';
   const n2d = todayEntry ? todayEntry.n2 : '—';
 
@@ -396,12 +396,12 @@ function buildClassView(cls) {
   </div>
 
   <button class="draw-btn" ${canDraw ? '' : 'disabled'} onclick="draw('${cls.id}')">
-    ${todayEntry ? 'Losuj ponownie' : 'Losuj dwie liczby'}
+    ${todayEntry ? 'Losuj ponownie' : (remaining.length === 1 ? 'Losuj ostatni numer' : 'Losuj dwie liczby')}
   </button>
 
   ${exhausted ? `<button class="draw-btn btn-reset" onclick="resetQueue('${cls.id}')">🔄 Resetuj kolejkę — nowa runda</button>` : ''}
-  ${!exhausted && remaining.length === 1 ? '<p style="color:var(--gold);font-style:italic;font-size:0.9rem;margin-bottom:8px;">⚠️ Tylko 1 numer pozostał — potrzeba minimum 2.</p>' : ''}
-  ${active.length < 2 ? '<p style="color:var(--accent);font-style:italic;font-size:0.9rem;margin-bottom:8px;">Włącz co najmniej 2 numery do puli.</p>' : ''}
+  ${active.length < 2 && active.length > 0 ? '<p style="color:var(--accent);font-style:italic;font-size:0.9rem;margin-bottom:8px;">Włącz co najmniej 2 numery do puli.</p>' : ''}
+  ${active.length === 0 ? '<p style="color:var(--accent);font-style:italic;font-size:0.9rem;margin-bottom:8px;">Włącz co najmniej 1 numer do puli.</p>' : ''}
 
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;margin-top:24px">
     <div class="section-title" style="margin-bottom:0">Historia losowań</div>
@@ -449,16 +449,19 @@ function draw(cid) {
   const drawn = cls.drawnQueue || [];
   const active = cls.pool.filter(p=>p.included).map(p=>p.n);
   const remaining = active.filter(n=>!drawn.includes(n));
-  if (remaining.length < 2) return;
+  if (remaining.length < 1) return;
 
   const shuffled = [...remaining].sort(() => Math.random() - 0.5);
-  const n1 = shuffled[0], n2 = shuffled[1];
-  cls.drawnQueue = [...drawn, n1, n2];
+  const n1 = shuffled[0];
+  const n2 = shuffled.length >= 2 ? shuffled[1] : null; // null gdy tylko 1 numer
+
+  cls.drawnQueue = n2 !== null ? [...drawn, n1, n2] : [...drawn, n1];
 
   const today = todayKey();
   const idx = cls.history.findIndex(h=>h.date===today);
-  if (idx >= 0) cls.history[idx] = {date:today, n1, n2};
-  else cls.history.push({date:today, n1, n2});
+  const entry = { date: today, n1, n2: n2 !== null ? n2 : '—' };
+  if (idx >= 0) cls.history[idx] = entry;
+  else cls.history.push(entry);
 
   saveState();
 
@@ -469,7 +472,8 @@ function draw(cid) {
     el1.offsetHeight;
     el1.style.animation = 'popIn 0.4s cubic-bezier(0.34,1.56,0.64,1)';
     el2.style.animation = 'popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.15s both';
-    el1.textContent = n1; el2.textContent = n2;
+    el1.textContent = n1;
+    el2.textContent = n2 !== null ? n2 : '–';
   }
   setTimeout(() => render(), 120);
 }
@@ -561,8 +565,7 @@ render();
 // ── SERVICE WORKER (PWA) ──
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .catch(() => navigator.serviceWorker.register('sw.js'));
+    navigator.serviceWorker.register('sw.js');
   });
 }
 </script>
