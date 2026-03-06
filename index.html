@@ -511,16 +511,6 @@ function buildClassView(cls) {
 
   // Ledger
   const sorted = [...cls.history].sort((a,b) => b.date.localeCompare(a.date));
-  const rows = sorted.length === 0
-    ? `<div class="ledger-empty">Brak historii losowań dla tej klasy.</div>`
-    : sorted.map(h => {
-        const isToday = h.date === todayKey();
-        return `<div class="ledger-row">
-          <div class="ledger-date">${formatDate(h.date)}${isToday?'<span class="today-badge">dziś</span>':''}</div>
-          <div class="ledger-num n1">${h.n1}</div>
-          <div class="ledger-num n2">${h.n2}</div>
-        </div>`;
-      }).join('');
 
   const canDraw = !exhausted && remaining.length >= 1;
   const drawCount = cls.drawCount || 2;
