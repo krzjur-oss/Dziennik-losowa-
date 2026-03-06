@@ -12,7 +12,7 @@ Aplikacja PWA do losowania uczniów z dziennika klasowego. Działa w przeglądar
 
 ## 📱 Instalacja na Androidzie
 
-1. Wejdź na: **https://krzjur-oss.github.io/dziennik-losowan-**
+1. Wejdź na: **https://krzjur-oss.github.io/Dziennik-losowa-/**
 2. W Chrome naciśnij menu ⋮ → **"Dodaj do ekranu głównego"**
 3. Gotowe — aplikacja działa jak natywna, bez paska przeglądarki
 
