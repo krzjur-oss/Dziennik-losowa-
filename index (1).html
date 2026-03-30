@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Dziennik Losowania</title>
+<meta name="theme-color" content="#8b1a1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Losowanie">
+<link rel="manifest" href="manifest.json">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #f5f0e8;
+  --paper: #fdf8f0;
+  --ink: #1a1208;
+  --ink2: #3d3020;
+  --muted: #8a7a60;
+  --line: #d4c9b0;
+  --accent: #8b1a1a;
+  --accent2: #1a4a8b;
+  --green: #1a6b3a;
+  --gold: #c9930a;
+  --shadow: rgba(26,18,8,0.12);
+  --drawn: #c9930a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  background-image: repeating-linear-gradient(
+    0deg, transparent, transparent 39px,
+    rgba(212,201,176,0.4) 39px, rgba(212,201,176,0.4) 40px
+  );
+  font-family: 'Crimson Pro', Georgia, serif;
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.header {
+  background: var(--paper);
+  border-bottom: 3px double var(--line);
+  padding: 14px 20px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 12px var(--shadow);
+  position: sticky; top: 0; z-index: 100; gap: 10px;
+}
+.logo { font-size: 1.4rem; font-weight: 700; color: var(--accent); letter-spacing: 0.03em; white-space: nowrap; }
+.logo span { color: var(--ink2); font-style: italic; font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.date-display { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--muted); }
+.btn-hdr {
+  font-family: 'Crimson Pro', serif; font-size: 0.8rem; font-weight: 600;
+  padding: 6px 12px; border-radius: 6px; border: 1.5px solid var(--line);
+  background: var(--paper); color: var(--muted); cursor: pointer; white-space: nowrap;
+}
+.btn-hdr:active { background: var(--bg); }
+
+.tabs {
+  display: flex; background: var(--paper);
+  border-bottom: 2px solid var(--line);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.tab {
+  padding: 10px 20px;
+  font-family: 'Crimson Pro', serif; font-size: 1rem; font-weight: 600;
+  color: var(--muted); background: transparent; border: none;
+  border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+}
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(139,26,26,0.04); }
+.tab-add { padding: 10px 16px; font-size: 1.3rem; color: var(--green); background: transparent; border: none; cursor: pointer; flex-shrink: 0; }
+.tab-wrap { display: flex; align-items: stretch; }
+.tab-del { background: transparent; border: none; color: var(--muted); font-size: 0.7rem; padding: 0 6px 0 0; cursor: pointer; display: none; align-items: center; }
+.tab-wrap:hover .tab-del, .tab-wrap.long-press .tab-del { display: flex; }
+
+.view { display: none; padding: 20px 16px; max-width: 900px; margin: 0 auto; }
+.view.active { display: block; }
+
+.section-title { font-size: 1.2rem; font-weight: 700; color: var(--ink2); margin-bottom: 4px; border-left: 4px solid var(--accent); padding-left: 12px; }
+.section-sub { font-style: italic; color: var(--muted); font-size: 0.9rem; margin-bottom: 16px; padding-left: 16px; }
+
+.btn { font-family: 'Crimson Pro', serif; font-size: 0.95rem; font-weight: 600; padding: 10px 18px; border-radius: 8px; border: none; cursor: pointer; transition: all 0.15s; }
+.btn-primary { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(139,26,26,0.3); }
+.btn-primary:active { transform: scale(0.97); }
+.btn-secondary { background: var(--paper); color: var(--accent2); border: 1.5px solid var(--accent2); }
+.btn-danger { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); font-size: 0.8rem; padding: 6px 12px; }
+
+.numbers-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; margin-bottom: 12px; }
+@media (max-width: 500px) { .numbers-grid { grid-template-columns: repeat(6, 1fr); } }
+
+.num-btn {
+  aspect-ratio: 1; border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 700;
+  border: 2px solid var(--line); background: var(--paper); color: var(--muted);
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent; position: relative;
+}
+.num-btn.in-pool { border-color: var(--green); background: rgba(26,107,58,0.08); color: var(--green); }
+.num-btn.drawn-already {
+  border-color: var(--drawn); background: rgba(201,147,10,0.12); color: var(--drawn);
+}
+.num-btn.drawn-already::after {
+  content: '✓'; position: absolute; top: 1px; right: 3px;
+  font-size: 0.55rem; color: var(--drawn); font-weight: 700;
+}
+.num-btn.excluded {
+  border-color: var(--line);
+  background: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(212,201,176,0.5) 4px, rgba(212,201,176,0.5) 5px);
+  color: var(--muted); opacity: 0.5;
+}
+.num-btn:active { transform: scale(0.92); }
+
+.pool-stats { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+.pool-stats b { color: var(--green); }
+.s-drawn { color: var(--drawn); font-weight: 700; }
+.s-left { color: var(--accent2); font-weight: 700; }
+
+.queue-banner { border-radius: 10px; padding: 10px 14px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; margin-bottom: 16px; line-height: 1.6; }
+.queue-banner.state-ok { background: rgba(26,74,139,0.08); border: 1.5px solid rgba(26,74,139,0.25); color: var(--accent2); }
+.queue-banner.state-done { background: rgba(139,26,26,0.07); border: 1.5px solid rgba(139,26,26,0.25); color: var(--accent); }
+.queue-banner.state-fresh { background: rgba(26,107,58,0.07); border: 1.5px solid rgba(26,107,58,0.25); color: var(--green); }
+
+.draw-stage {
+  background: var(--paper); border: 2px solid var(--line); border-radius: 16px;
+  padding: 28px 20px; text-align: center; margin-bottom: 16px;
+  box-shadow: inset 0 2px 8px var(--shadow), 0 4px 16px var(--shadow);
+  position: relative; overflow: hidden;
+}
+.draw-stage::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--gold), var(--accent2)); }
+.draw-label { font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.draw-numbers { display: flex; justify-content: center; gap: 24px; align-items: center; margin: 10px 0 16px; flex-wrap: wrap; }
+.draw-num { font-family: 'JetBrains Mono', monospace; font-size: clamp(3.5rem, 12vw, 7rem); font-weight: 700; color: var(--accent); line-height: 1; min-width: 1.5ch; text-align: center; animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+.draw-num.second { color: var(--accent2); }
+.draw-separator { font-size: 3rem; color: var(--line); font-weight: 300; }
+@keyframes popIn { from { transform: scale(0.3) rotate(-10deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
+.draw-date { font-style: italic; color: var(--muted); font-size: 0.95rem; }
+
+.draw-btn { font-family: 'Crimson Pro', serif; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.05em; padding: 16px 40px; background: var(--accent); color: #fff; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 20px rgba(139,26,26,0.35); transition: all 0.15s; width: 100%; margin-bottom: 8px; }
+.draw-btn:active { transform: scale(0.97); }
+.draw-btn:disabled { background: var(--line); color: var(--muted); box-shadow: none; cursor: not-allowed; }
+.draw-btn.btn-reset { background: var(--gold); box-shadow: 0 4px 20px rgba(201,147,10,0.3); font-size: 1.05rem; padding: 13px; }
+
+.ledger { background: var(--paper); border: 1.5px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px var(--shadow); }
+.ledger-header { display: grid; grid-template-columns: 1fr 80px 80px; padding: 10px 16px; background: var(--ink2); color: #e8dfc8; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.ledger-row { display: grid; grid-template-columns: 1fr 80px 80px; padding: 12px 16px; border-bottom: 1px solid var(--line); align-items: center; animation: slideIn 0.3s ease; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; } }
+.ledger-row:last-child { border-bottom: none; }
+.ledger-row:nth-child(even) { background: rgba(212,201,176,0.15); }
+.ledger-date { font-style: italic; color: var(--ink2); font-size: 0.95rem; }
+.ledger-num { font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; font-weight: 700; text-align: center; }
+.ledger-num.n1 { color: var(--accent); }
+.ledger-num.n2 { color: var(--accent2); }
+.ledger-empty { padding: 32px; text-align: center; color: var(--muted); font-style: italic; font-size: 1.05rem; }
+.today-badge { display: inline-block; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; background: var(--gold); color: #fff; border-radius: 4px; padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
+
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(26,18,8,0.6); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+.modal-bg.open { display: flex; }
+.modal { background: var(--paper); border: 2px solid var(--line); border-radius: 16px; padding: 28px 24px; width: 100%; max-width: 460px; box-shadow: 0 8px 40px rgba(26,18,8,0.3); }
+.modal h2 { font-size: 1.4rem; font-weight: 700; color: var(--ink); margin-bottom: 16px; }
+.modal input { width: 100%; font-family: 'Crimson Pro', serif; font-size: 1.1rem; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); outline: none; margin-bottom: 16px; }
+.modal textarea { width: 100%; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); outline: none; margin-bottom: 16px; height: 130px; resize: vertical; }
+.modal p { font-size: 0.9rem; color: var(--muted); font-style: italic; margin-bottom: 14px; line-height: 1.5; }
+.modal-btns { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+
+.no-class { text-align: center; padding: 60px 20px; color: var(--muted); }
+.no-class .big { font-size: 3rem; margin-bottom: 12px; }
+.no-class p { font-size: 1.1rem; font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Dziennik <span>Losowania</span></div>
+  <div class="header-right">
+    <div class="date-display" id="headerDate"></div>
+    <button class="btn-hdr" onclick="openExportModal()">💾 Eksport</button>
+    <button class="btn-hdr" onclick="openImportModal()">📂 Import</button>
+  </div>
+</div>
+
+<div class="tabs" id="tabs">
+  <button class="tab-add" onclick="openNewClassModal()">＋</button>
+</div>
+<div id="views"></div>
+
+<div class="view active" id="viewNoClass">
+  <div class="no-class">
+    <div class="big">📒</div>
+    <p>Nie masz jeszcze żadnej klasy.<br>Naciśnij <b>＋</b> aby dodać pierwszą klasę.</p>
+  </div>
+</div>
+
+<!-- Modal: nowa klasa -->
+<div class="modal-bg" id="modalNewClass">
+  <div class="modal">
+    <h2>Nowa klasa</h2>
+    <input type="text" id="newClassName" placeholder="np. 3B, 2A, Fizyka 1..." maxlength="20">
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal('modalNewClass')">Anuluj</button>
+      <button class="btn btn-primary" onclick="createClass()">Dodaj klasę</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: eksport -->
+<div class="modal-bg" id="modalExport">
+  <div class="modal">
+    <h2>💾 Eksport danych</h2>
+    <p>Pobierz plik JSON z danymi wszystkich klas i historią losowań. Można go później wczytać przez Import.</p>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal('modalExport')">Zamknij</button>
+      <button class="btn btn-primary" onclick="downloadExport()">📥 Pobierz plik</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: import -->
+<div class="modal-bg" id="modalImport">
+  <div class="modal">
+    <h2>📂 Import danych</h2>
+    <p>Wybierz wcześniej wyeksportowany plik JSON. <strong>Uwaga: zastąpi to wszystkie bieżące dane!</strong></p>
+    <input type="file" id="importFile" accept=".json" style="margin-bottom:16px">
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal('modalImport')">Anuluj</button>
+      <button class="btn btn-primary" onclick="doImport()">Wczytaj dane</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'dziennik_v4';
+let state = loadState();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      (parsed.classes || []).forEach(c => { if (!c.drawnQueue) c.drawnQueue = []; });
+      return parsed;
+    }
+  } catch(e) {}
+  return { classes: [], activeClass: null };
+}
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function todayStr() {
+  return new Date().toLocaleDateString('pl-PL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function formatDate(ds) {
+  const [y,m,d] = ds.split('-');
+  return new Date(y,m-1,d).toLocaleDateString('pl-PL', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+document.getElementById('headerDate').textContent = todayStr();
+
+// ── RENDER ──
+function render() { renderTabs(); renderViews(); }
+
+function renderTabs() {
+  const tabs = document.getElementById('tabs');
+  const addBtn = tabs.querySelector('.tab-add');
+  tabs.innerHTML = '';
+  state.classes.forEach(cls => {
+    const wrap = document.createElement('div');
+    wrap.className = 'tab-wrap';
+    const tab = document.createElement('button');
+    tab.className = 'tab' + (state.activeClass === cls.id ? ' active' : '');
+    tab.textContent = cls.name;
+    tab.onclick = () => switchClass(cls.id);
+    let timer;
+    tab.addEventListener('touchstart', () => { timer = setTimeout(() => wrap.classList.add('long-press'), 600); });
+    tab.addEventListener('touchend', () => clearTimeout(timer));
+    const del = document.createElement('button');
+    del.className = 'tab-del'; del.textContent = '✕';
+    del.onclick = e => { e.stopPropagation(); deleteClass(cls.id); };
+    wrap.appendChild(tab); wrap.appendChild(del); tabs.appendChild(wrap);
+  });
+  tabs.appendChild(addBtn);
+}
+
+function renderViews() {
+  const container = document.getElementById('views');
+  container.innerHTML = '';
+  state.classes.forEach(cls => {
+    const view = document.createElement('div');
+    view.className = 'view' + (state.activeClass === cls.id ? ' active' : '');
+    view.id = 'view_' + cls.id;
+    view.innerHTML = buildClassView(cls);
+    container.appendChild(view);
+    view.querySelectorAll('.num-btn').forEach(btn => {
+      btn.onclick = () => toggleNumber(cls.id, parseInt(btn.dataset.n));
+    });
+  });
+  document.getElementById('viewNoClass').className = 'view' + (state.classes.length === 0 ? ' active' : '');
+}
+
+function buildClassView(cls) {
+  const active = cls.pool.filter(p => p.included).map(p => p.n);
+  const excluded = cls.pool.filter(p => !p.included).map(p => p.n);
+  const drawn = cls.drawnQueue || [];
+  const remaining = active.filter(n => !drawn.includes(n));
+  const exhausted = active.length > 0 && remaining.length === 0;
+  const todayEntry = cls.history.find(h => h.date === todayKey());
+
+  // Grid
+  let grid = '';
+  cls.pool.forEach(p => {
+    let c = 'excluded';
+    if (p.included) c = drawn.includes(p.n) ? 'drawn-already' : 'in-pool';
+    grid += `<button class="num-btn ${c}" data-n="${p.n}">${p.n}</button>`;
+  });
+
+  // Banner
+  let banner = '';
+  if (exhausted) {
+    banner = `<div class="queue-banner state-done">⚠️ Wszyscy uczniowie zostali już wylosowani! Naciśnij „Resetuj kolejkę" aby zacząć od nowa.</div>`;
+  } else if (drawn.length > 0) {
+    const next = remaining.slice(0,6).join(', ') + (remaining.length > 6 ? '…' : '');
+    banner = `<div class="queue-banner state-ok">🎲 Wylosowani: <b>${drawn.length}</b> z ${active.length} &nbsp;·&nbsp; Pozostało: <b>${remaining.length}</b><br>Jeszcze w puli: ${next}</div>`;
+  } else {
+    banner = `<div class="queue-banner state-fresh">✓ Nowa runda — wszyscy <b>${active.length}</b> uczniowie z puli czekają na losowanie.</div>`;
+  }
+
+  // Ledger
+  const sorted = [...cls.history].sort((a,b) => b.date.localeCompare(a.date));
+  const rows = sorted.length === 0
+    ? `<div class="ledger-empty">Brak historii losowań dla tej klasy.</div>`
+    : sorted.map(h => {
+        const isToday = h.date === todayKey();
+        return `<div class="ledger-row">
+          <div class="ledger-date">${formatDate(h.date)}${isToday?'<span class="today-badge">dziś</span>':''}</div>
+          <div class="ledger-num n1">${h.n1}</div>
+          <div class="ledger-num n2">${h.n2}</div>
+        </div>`;
+      }).join('');
+
+  const canDraw = !exhausted && remaining.length >= 2;
+  const n1d = todayEntry ? todayEntry.n1 : '—';
+  const n2d = todayEntry ? todayEntry.n2 : '—';
+
+  return `
+  <div class="section-title">Pula klasy ${esc(cls.name)}</div>
+  <p class="section-sub">
+    Kliknij numer aby włączyć / wyłączyć.&nbsp;
+    <span style="color:var(--green)">●</span> aktywny &nbsp;
+    <span style="color:var(--drawn)">●</span> już wylosowany &nbsp;
+    <span style="color:var(--muted)">●</span> wykluczony
+  </p>
+
+  <div class="pool-stats">
+    W puli: <b>${active.length}</b> / 30 &nbsp;·&nbsp;
+    Wylosowani: <span class="s-drawn">${drawn.length}</span> &nbsp;·&nbsp;
+    Pozostało: <span class="s-left">${remaining.length}</span>
+    ${excluded.length > 0 ? `<br>Wykluczone nr: ${excluded.join(', ')}` : ''}
+  </div>
+
+  <div class="numbers-grid">${grid}</div>
+
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <button class="btn btn-secondary" onclick="selectAll('${cls.id}')">Zaznacz wszystkie</button>
+    <button class="btn btn-secondary" onclick="deselectAll('${cls.id}')">Odznacz wszystkie</button>
+  </div>
+
+  ${banner}
+
+  <div class="section-title">Losowanie</div>
+  <p class="section-sub">Każdy numer losowany jest tylko raz — bez powtórzeń aż do wyczerpania puli.</p>
+
+  <div class="draw-stage">
+    <div class="draw-label">Wylosowane numery — ${todayStr()}</div>
+    <div class="draw-numbers">
+      <div class="draw-num" id="dn1_${cls.id}">${n1d}</div>
+      <div class="draw-separator">·</div>
+      <div class="draw-num second" id="dn2_${cls.id}">${n2d}</div>
+    </div>
+    <div class="draw-date">${todayEntry ? 'Wylosowano dziś' : 'Brak losowania na dziś'}</div>
+  </div>
+
+  <button class="draw-btn" ${canDraw ? '' : 'disabled'} onclick="draw('${cls.id}')">
+    ${todayEntry ? 'Losuj ponownie' : 'Losuj dwie liczby'}
+  </button>
+
+  ${exhausted ? `<button class="draw-btn btn-reset" onclick="resetQueue('${cls.id}')">🔄 Resetuj kolejkę — nowa runda</button>` : ''}
+  ${!exhausted && remaining.length === 1 ? '<p style="color:var(--gold);font-style:italic;font-size:0.9rem;margin-bottom:8px;">⚠️ Tylko 1 numer pozostał — potrzeba minimum 2.</p>' : ''}
+  ${active.length < 2 ? '<p style="color:var(--accent);font-style:italic;font-size:0.9rem;margin-bottom:8px;">Włącz co najmniej 2 numery do puli.</p>' : ''}
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;margin-top:24px">
+    <div class="section-title" style="margin-bottom:0">Historia losowań</div>
+    ${cls.history.length > 0 ? `<button class="btn btn-danger" onclick="clearHistory('${cls.id}')">Wyczyść historię</button>` : ''}
+  </div>
+  <div class="ledger">
+    <div class="ledger-header">
+      <div>Data</div><div style="text-align:center">Nr 1</div><div style="text-align:center">Nr 2</div>
+    </div>
+    ${rows}
+  </div>`;
+}
+
+// ── ACTIONS ──
+function switchClass(id) { state.activeClass = id; saveState(); render(); }
+
+function toggleNumber(cid, n) {
+  const cls = state.classes.find(c => c.id === cid);
+  const p = cls.pool.find(p => p.n === n);
+  if (!p) return;
+  p.included = !p.included;
+  if (!p.included) cls.drawnQueue = cls.drawnQueue.filter(x => x !== n);
+  saveState(); render();
+}
+
+function selectAll(cid) {
+  state.classes.find(c=>c.id===cid).pool.forEach(p=>p.included=true);
+  saveState(); render();
+}
+
+function deselectAll(cid) {
+  const cls = state.classes.find(c=>c.id===cid);
+  cls.pool.forEach(p=>p.included=false);
+  cls.drawnQueue = [];
+  saveState(); render();
+}
+
+function resetQueue(cid) {
+  state.classes.find(c=>c.id===cid).drawnQueue = [];
+  saveState(); render();
+}
+
+function draw(cid) {
+  const cls = state.classes.find(c=>c.id===cid);
+  const drawn = cls.drawnQueue || [];
+  const active = cls.pool.filter(p=>p.included).map(p=>p.n);
+  const remaining = active.filter(n=>!drawn.includes(n));
+  if (remaining.length < 2) return;
+
+  const shuffled = [...remaining].sort(() => Math.random() - 0.5);
+  const n1 = shuffled[0], n2 = shuffled[1];
+  cls.drawnQueue = [...drawn, n1, n2];
+
+  const today = todayKey();
+  const idx = cls.history.findIndex(h=>h.date===today);
+  if (idx >= 0) cls.history[idx] = {date:today, n1, n2};
+  else cls.history.push({date:today, n1, n2});
+
+  saveState();
+
+  const el1 = document.getElementById('dn1_'+cid);
+  const el2 = document.getElementById('dn2_'+cid);
+  if (el1 && el2) {
+    el1.style.animation = el2.style.animation = 'none';
+    el1.offsetHeight;
+    el1.style.animation = 'popIn 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+    el2.style.animation = 'popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.15s both';
+    el1.textContent = n1; el2.textContent = n2;
+  }
+  setTimeout(() => render(), 120);
+}
+
+function clearHistory(cid) {
+  if (!confirm('Wyczyścić historię losowań tej klasy?')) return;
+  state.classes.find(c=>c.id===cid).history = [];
+  saveState(); render();
+}
+
+function deleteClass(cid) {
+  if (!confirm('Usunąć tę klasę wraz z całą historią?')) return;
+  state.classes = state.classes.filter(c=>c.id!==cid);
+  if (state.activeClass === cid)
+    state.activeClass = state.classes.length > 0 ? state.classes[0].id : null;
+  saveState(); render();
+}
+
+// ── MODALS ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function openNewClassModal() {
+  openModal('modalNewClass');
+  setTimeout(() => document.getElementById('newClassName').focus(), 100);
+}
+
+function createClass() {
+  const name = document.getElementById('newClassName').value.trim();
+  if (!name) return;
+  const id = 'cls_' + Date.now();
+  const pool = Array.from({length:30}, (_,i) => ({n:i+1, included:true}));
+  state.classes.push({id, name, pool, history:[], drawnQueue:[]});
+  state.activeClass = id;
+  saveState();
+  closeModal('modalNewClass');
+  document.getElementById('newClassName').value = '';
+  render();
+}
+
+document.getElementById('newClassName').addEventListener('keydown', e => { if(e.key==='Enter') createClass(); });
+['modalNewClass','modalExport','modalImport'].forEach(id => {
+  document.getElementById(id).addEventListener('click', function(e) { if(e.target===this) closeModal(id); });
+});
+
+// ── EXPORT / IMPORT ──
+function openExportModal() {
+  openModal('modalExport');
+}
+
+function downloadExport() {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const d = new Date();
+  const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  a.href = url;
+  a.download = `dziennik-losowania-${dateStr}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  closeModal('modalExport');
+}
+
+function openImportModal() {
+  document.getElementById('importFile').value = '';
+  openModal('modalImport');
+}
+
+function doImport() {
+  const fileInput = document.getElementById('importFile');
+  if (!fileInput.files || fileInput.files.length === 0) {
+    alert('Wybierz plik do zaimportowania.');
+    return;
+  }
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed.classes || !Array.isArray(parsed.classes)) throw new Error();
+      parsed.classes.forEach(c => { if(!c.drawnQueue) c.drawnQueue = []; });
+      if (!confirm(`Import wczyta ${parsed.classes.length} klas(y) i zastąpi bieżące dane. Kontynuować?`)) return;
+      state = parsed;
+      saveState();
+      closeModal('modalImport');
+      render();
+      alert('Dane wczytane pomyślnie!');
+    } catch(err) {
+      alert('Błąd: nieprawidłowy format pliku. Upewnij się, że wybierasz poprawny plik JSON z eksportu.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+render();
+
+// ── SERVICE WORKER (PWA) ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .catch(() => navigator.serviceWorker.register('sw.js'));
+  });
+}
+</script>
+</body>
+</html>
