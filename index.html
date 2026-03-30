@@ -171,6 +171,11 @@ body {
 .no-class { text-align: center; padding: 60px 20px; color: var(--muted); }
 .no-class .big { font-size: 3rem; margin-bottom: 12px; }
 .no-class p { font-size: 1.1rem; font-style: italic; }
+
+.modal ul { margin: 8px 0 8px 20px; }
+.modal ul li { margin-bottom: 4px; }
+.modal table td { vertical-align: top; }
+.modal h3 { font-size: 1.05rem; margin: 16px 0 8px; color: var(--accent); }
 </style>
 </head>
 <body>
@@ -179,6 +184,8 @@ body {
   <div class="logo">Dziennik <span>Losowania</span></div>
   <div class="header-right">
     <div class="date-display" id="headerDate"></div>
+    <button class="btn-hdr" onclick="openHelpModal()">❓ Pomoc</button>
+    <button class="btn-hdr" onclick="openManageClassesModal()">🗂 Klasy</button>
     <button class="btn-hdr" onclick="openExportModal()">💾 Eksport</button>
     <button class="btn-hdr" onclick="openImportModal()">📂 Import</button>
   </div>
@@ -199,11 +206,25 @@ body {
 <!-- Modal: nowa klasa -->
 <div class="modal-bg" id="modalNewClass">
   <div class="modal">
-    <h2>Nowa klasa</h2>
-    <input type="text" id="newClassName" placeholder="np. 3B, 2A, Fizyka 1..." maxlength="20">
+    <h2>Dodaj klasy</h2>
+    <p>Wpisz jedną nazwę lub wiele nazw oddzielonych przecinkami (np. <i>3B, 2A, Fizyka 1</i>).</p>
+    <input type="text" id="newClassName" placeholder="np. 3B, 2A, Fizyka 1...">
     <div class="modal-btns">
       <button class="btn btn-secondary" onclick="closeModal('modalNewClass')">Anuluj</button>
-      <button class="btn btn-primary" onclick="createClass()">Dodaj klasę</button>
+      <button class="btn btn-primary" onclick="createClass()">Dodaj</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: zarządzanie klasami -->
+<div class="modal-bg" id="modalManageClasses">
+  <div class="modal" style="max-width:500px">
+    <h2>Zarządzaj klasami</h2>
+    <p>Zaznacz klasy, które chcesz usunąć, a następnie kliknij „Usuń zaznaczone".</p>
+    <div id="classListManage" style="margin-bottom:16px;max-height:50vh;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+    <div class="modal-btns" style="position:sticky;bottom:0;background:var(--paper);padding-top:12px;margin-top:8px;border-top:1px solid var(--line)">
+      <button class="btn btn-secondary" onclick="closeModal('modalManageClasses')">Zamknij</button>
+      <button class="btn btn-danger" onclick="deleteSelectedClasses()">Usuń zaznaczone</button>
     </div>
   </div>
 </div>
@@ -229,6 +250,103 @@ body {
     <div class="modal-btns">
       <button class="btn btn-secondary" onclick="closeModal('modalImport')">Anuluj</button>
       <button class="btn btn-primary" onclick="doImport()">Wczytaj dane</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: samouczek -->
+<div class="modal-bg" id="modalTutorial">
+  <div class="modal" style="max-width:540px;max-height:80vh;overflow-y:auto">
+    <h2>📖 Samouczek — Dziennik Losowania</h2>
+    <div style="font-size:0.95rem;line-height:1.7;color:var(--ink2)">
+      <p style="margin-bottom:14px"><b>Witaj!</b> Ta aplikacja pomaga losować numery uczniów w klasie bez powtórzeń.</p>
+
+      <h3 style="font-size:1.05rem;margin:16px 0 8px;color:var(--accent)">1. Dodawanie klasy</h3>
+      <p>Kliknij przycisk <b>＋</b> na pasku kart, wpisz nazwę klasy (np. <i>3B</i>) lub wiele nazw oddzielonych przecinkami (np. <i>3B, 2A, Fizyka 1</i>) i potwierdź. Każda klasa ma własną pulę numerów i historię.</p>
+
+      <h3 style="font-size:1.05rem;margin:16px 0 8px;color:var(--accent)">2. Konfiguracja puli uczniów</h3>
+      <p>Domyślnie w puli jest 30 numerów. Klikaj numery, aby je włączać/wyłączać:</p>
+      <ul style="margin:8px 0 8px 20px">
+        <li><span style="color:var(--green)">●</span> <b>Zielony</b> — aktywny w puli</li>
+        <li><span style="color:var(--drawn)">●</span> <b>Złoty</b> — już wylosowany (zniknie po resecie kolejki)</li>
+        <li><span style="color:var(--muted)">●</span> <b>Szary</b> — wykluczony z losowania</li>
+      </ul>
+      <p>Użyj przycisków <b>Zaznacz wszystkie</b> / <b>Odznacz wszystkie</b> dla szybkiej zmiany.</p>
+
+      <h3 style="font-size:1.05rem;margin:16px 0 8px;color:var(--accent)">3. Losowanie</h3>
+      <p>Naciśnij duży przycisk <b>„Losuj dwie liczby"</b>. Aplikacja wylosuje 2 numery z puli — każdy uczeń jest losowany tylko raz na rundę.</p>
+      <p>Po wyczerpaniu puli pojawi się przycisk <b>„Resetuj kolejkę"</b>, który pozwala zacząć nową rundę.</p>
+
+      <h3 style="font-size:1.05rem;margin:16px 0 8px;color:var(--accent)">4. Historia losowań</h3>
+      <p>Na dole każdej klasy znajduje się dziennik z historią wszystkich losowań — datą i wylosowanymi numerami. Możesz go wyczyścić przyciskiem <b>„Wyczyść historię"</b>.</p>
+
+      <h3 style="font-size:1.05rem;margin:16px 0 8px;color:var(--accent)">5. Eksport i Import</h3>
+      <p>Użyj przycisków <b>💾 Eksport</b> i <b>📂 Import</b> w nagłówku, aby zapisać lub wczytać dane w formacie JSON.</p>
+
+      <h3 style="font-size:1.05rem;margin:16px 0 8px;color:var(--accent)">6. Usuwanie klasy</h3>
+      <p>Najedź myszą na kartę klasy i kliknij <b>✕</b>, aby usunąć pojedynczą klasę. Możesz też użyć przycisku <b>🗂 Klasy</b> w nagłówku, aby zaznaczyć i usunąć wiele klas jednocześnie.</p>
+
+      <p style="margin-top:18px;padding:10px 14px;background:rgba(26,107,58,0.07);border-radius:8px;border:1px solid rgba(26,107,58,0.2)">
+        💡 <b>Wskazówka:</b> Aplikacja działa jako PWA — możesz ją zainstalować na telefonie/tablecie i używać offline!
+      </p>
+    </div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn btn-primary" onclick="closeModal('modalTutorial')">Rozumiem!</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: pomoc -->
+<div class="modal-bg" id="modalHelp">
+  <div class="modal" style="max-width:500px;max-height:80vh;overflow-y:auto">
+    <h2>❓ Pomoc</h2>
+    <div style="font-size:0.95rem;line-height:1.7;color:var(--ink2)">
+      <h3 style="font-size:1rem;margin:0 0 8px;color:var(--accent)">Skróty i funkcje</h3>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
+        <tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:6px 0"><b>＋</b></td>
+          <td style="padding:6px 0">Dodaj nową klasę</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:6px 0"><b>✕</b></td>
+          <td style="padding:6px 0">Usuń kartę klasy (po najechaniu)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:6px 0"><b>🗂 Klasy</b></td>
+          <td style="padding:6px 0">Zaznacz i usuń wiele klas naraz</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:6px 0"><b>💾 Eksport</b></td>
+          <td style="padding:6px 0">Pobierz dane jako plik JSON</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:6px 0"><b>📂 Import</b></td>
+          <td style="padding:6px 0">Wczytaj dane z pliku JSON</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:6px 0"><b>📖 Samouczek</b></td>
+          <td style="padding:6px 0">Instrukcja obsługi krok po kroku</td>
+        </tr>
+      </table>
+
+      <h3 style="font-size:1rem;margin:0 0 8px;color:var(--accent)">Stany numerów</h3>
+      <ul style="margin:0 0 16px 20px">
+        <li><span style="color:var(--green)">●</span> <b>W puli</b> — numer uczestniczy w losowaniu</li>
+        <li><span style="color:var(--drawn)">●</span> <b>Wylosowany</b> — już wybrany w tej rundzie</li>
+        <li><span style="color:var(--muted)">●</span> <b>Wykluczony</b> — nie bierze udziału w losowaniu</li>
+      </ul>
+
+      <h3 style="font-size:1rem;margin:0 0 8px;color:var(--accent)">Jak działa kolejka?</h3>
+      <p>Każdy numer jest losowany <b>dokładnie raz</b> w rundzie. Po wyczerpaniu puli należy zresetować kolejkę, aby rozpocząć nową rundę. Historia losowań jest zachowywana.</p>
+
+      <h3 style="font-size:1rem;margin:16px 0 8px;color:var(--accent)">Dane i prywatność</h3>
+      <p>Wszystkie dane są przechowywane lokalnie w przeglądarce (<code>localStorage</code>). Nie są wysyłane na żaden serwer.</p>
+
+      <h3 style="font-size:1rem;margin:16px 0 8px;color:var(--accent)">PWA — tryb offline</h3>
+      <p>Aplikacja działa jako Progressive Web App. Możesz ją zainstalować na ekranie głównym telefonu lub tabletu i używać bez połączenia z internetem.</p>
+    </div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn btn-primary" onclick="closeModal('modalHelp')">Zamknij</button>
     </div>
   </div>
 </div>
@@ -496,13 +614,56 @@ function openNewClassModal() {
   setTimeout(() => document.getElementById('newClassName').focus(), 100);
 }
 
+function openTutorialModal() { openModal('modalTutorial'); }
+function openHelpModal() { openModal('modalHelp'); }
+function openManageClassesModal() {
+  const container = document.getElementById('classListManage');
+  if (state.classes.length === 0) {
+    container.innerHTML = '<p style="color:var(--muted);font-style:italic;text-align:center;padding:20px">Brak klas do zarządzania.</p>';
+  } else {
+    container.innerHTML = state.classes.map(cls => `
+      <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid var(--line);cursor:pointer">
+        <input type="checkbox" class="cls-check" value="${cls.id}" style="width:18px;height:18px;cursor:pointer">
+        <span style="font-weight:600;font-size:1rem">${esc(cls.name)}</span>
+        <span style="color:var(--muted);font-size:0.8rem;margin-left:auto">${cls.pool.filter(p=>p.included).length} uczniów</span>
+      </label>
+    `).join('');
+  }
+  openModal('modalManageClasses');
+}
+
+function deleteSelectedClasses() {
+  const checks = document.querySelectorAll('.cls-check:checked');
+  if (checks.length === 0) { alert('Nie zaznaczono żadnej klasy.'); return; }
+  const names = [];
+  const ids = [];
+  checks.forEach(ch => {
+    const cls = state.classes.find(c => c.id === ch.value);
+    if (cls) { names.push(cls.name); ids.push(cls.id); }
+  });
+  if (!confirm(`Usunąć ${ids.length} klas(y): ${names.join(', ')}?`)) return;
+  state.classes = state.classes.filter(c => !ids.includes(c.id));
+  if (!state.classes.find(c => c.id === state.activeClass)) {
+    state.activeClass = state.classes.length > 0 ? state.classes[0].id : null;
+  }
+  saveState();
+  closeModal('modalManageClasses');
+  render();
+}
+
 function createClass() {
-  const name = document.getElementById('newClassName').value.trim();
-  if (!name) return;
-  const id = 'cls_' + Date.now();
-  const pool = Array.from({length:30}, (_,i) => ({n:i+1, included:true}));
-  state.classes.push({id, name, pool, history:[], drawnQueue:[]});
-  state.activeClass = id;
+  const input = document.getElementById('newClassName').value.trim();
+  if (!input) return;
+  const names = input.split(',').map(s => s.trim()).filter(s => s.length > 0);
+  if (names.length === 0) return;
+  let lastId = null;
+  names.forEach(name => {
+    const id = 'cls_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+    const pool = Array.from({length:30}, (_,i) => ({n:i+1, included:true}));
+    state.classes.push({id, name, pool, history:[], drawnQueue:[]});
+    lastId = id;
+  });
+  state.activeClass = lastId;
   saveState();
   closeModal('modalNewClass');
   document.getElementById('newClassName').value = '';
@@ -510,7 +671,7 @@ function createClass() {
 }
 
 document.getElementById('newClassName').addEventListener('keydown', e => { if(e.key==='Enter') createClass(); });
-['modalNewClass','modalExport','modalImport'].forEach(id => {
+['modalNewClass','modalExport','modalImport','modalTutorial','modalHelp','modalManageClasses'].forEach(id => {
   document.getElementById(id).addEventListener('click', function(e) { if(e.target===this) closeModal(id); });
 });
 
@@ -567,6 +728,12 @@ function doImport() {
 }
 
 render();
+
+// ── FIRST VISIT: auto-open tutorial ──
+if (!localStorage.getItem('dziennik_visited')) {
+  localStorage.setItem('dziennik_visited', '1');
+  openTutorialModal();
+}
 
 // ── SERVICE WORKER (PWA) ──
 if ('serviceWorker' in navigator) {
