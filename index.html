@@ -188,6 +188,7 @@ body {
     <button class="btn-hdr" onclick="openManageClassesModal()">🗂 Klasy</button>
     <button class="btn-hdr" onclick="openExportModal()">💾 Eksport</button>
     <button class="btn-hdr" onclick="openImportModal()">📂 Import</button>
+    <button class="btn-hdr" onclick="openUpdateModal()">🆕 Aktualizacje</button>
   </div>
 </div>
 
@@ -351,8 +352,50 @@ body {
   </div>
 </div>
 
+<!-- Modal: aktualizacje -->
+<div class="modal-bg" id="modalUpdate">
+  <div class="modal" style="max-width:540px;max-height:80vh;overflow-y:auto">
+    <h2>🆕 Aktualizacje</h2>
+    <div id="updateContent" style="font-size:0.95rem;line-height:1.7;color:var(--ink2)"></div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn btn-primary" onclick="closeModal('modalUpdate')">Zamknij</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const STORAGE_KEY = 'dziennik_v4';
+const APP_VERSION = '1.1';
+const UPDATES = [
+  {
+    version: '1.1',
+    date: '2026-03-31',
+    title: 'Naprawy i ulepszenia',
+    changes: [
+      'Naprawiono animację losowania — jest teraz widoczna w całości',
+      'Historia losowań przechowuje teraz wszystkie pary z dnia (nie tylko ostatnią)',
+      'Naprawiono import — aktywna klasa ustawiana automatycznie po imporcie',
+      'Dodano walidację struktury importowanych plików JSON',
+      'Dodano przycisk resetu kolejki gdy pozostał 1 numer',
+      'Dodano zamykanie modali klawiszem Escape',
+      'Dodano obsługę touchcancel dla przycisków na urządzeniach dotykowych',
+      'Nowy system powiadomień o aktualizacjach'
+    ]
+  },
+  {
+    version: '1.0',
+    date: '2026-03-30',
+    title: 'Wersja początkowa',
+    changes: [
+      'Tworzenie i zarządzanie klasami',
+      'Konfiguracja puli uczniów (numery 1-30)',
+      'Losowanie dwóch numerów bez powtórzeń',
+      'Historia losowań z datami',
+      'Eksport i import danych (JSON)',
+      'Aplikacja PWA — tryb offline'
+    ]
+  }
+];
 let state = loadState();
 
 function loadState() {
@@ -673,12 +716,12 @@ const newClassInput = document.getElementById('newClassName');
 if (newClassInput) newClassInput.addEventListener('keydown', e => { if(e.key==='Enter') createClass(); });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    ['modalNewClass','modalExport','modalImport','modalTutorial','modalHelp','modalManageClasses'].forEach(id => {
+    ['modalNewClass','modalExport','modalImport','modalTutorial','modalHelp','modalManageClasses','modalUpdate'].forEach(id => {
       if (document.getElementById(id).classList.contains('open')) closeModal(id);
     });
   }
 });
-['modalNewClass','modalExport','modalImport','modalTutorial','modalHelp','modalManageClasses'].forEach(id => {
+['modalNewClass','modalExport','modalImport','modalTutorial','modalHelp','modalManageClasses','modalUpdate'].forEach(id => {
   document.getElementById(id).addEventListener('click', function(e) { if(e.target===this) closeModal(id); });
 });
 
@@ -742,6 +785,37 @@ function doImport() {
 }
 
 render();
+
+// ── UPDATE NOTIFICATION ──
+function renderUpdateContent() {
+  const container = document.getElementById('updateContent');
+  container.innerHTML = UPDATES.map(u => `
+    <h3 style="font-size:1.05rem;margin:16px 0 8px;color:var(--accent)">${u.title} — v${u.version} (${u.date})</h3>
+    <ul style="margin:0 0 8px 20px">
+      ${u.changes.map(c => `<li style="margin-bottom:4px">${c}</li>`).join('')}
+    </ul>
+  `).join('');
+}
+
+function openUpdateModal() {
+  renderUpdateContent();
+  localStorage.setItem('dziennik_lastSeenVersion', APP_VERSION);
+  const badge = document.getElementById('updateBadge');
+  if (badge) badge.style.display = 'none';
+  openModal('modalUpdate');
+}
+
+const lastSeen = localStorage.getItem('dziennik_lastSeenVersion');
+if (!lastSeen || lastSeen !== APP_VERSION) {
+  const helpBtn = document.querySelector('.btn-hdr[onclick="openUpdateModal()"]');
+  if (helpBtn) {
+    const badge = document.createElement('span');
+    badge.id = 'updateBadge';
+    badge.style.cssText = 'display:inline-block;background:var(--accent);color:#fff;font-size:0.6rem;border-radius:50%;width:16px;height:16px;line-height:16px;text-align:center;margin-left:4px;vertical-align:middle;font-family:JetBrains Mono,monospace;font-weight:700';
+    badge.textContent = '!';
+    helpBtn.appendChild(badge);
+  }
+}
 
 // ── FIRST VISIT: auto-open tutorial ──
 if (!localStorage.getItem('dziennik_visited')) {
