@@ -147,8 +147,8 @@ body {
 .draw-btn.btn-reset { background: var(--gold); box-shadow: 0 4px 20px rgba(201,147,10,0.3); font-size: 1.05rem; padding: 13px; }
 
 .ledger { background: var(--paper); border: 1.5px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px var(--shadow); }
-.ledger-header { display: grid; grid-template-columns: 1fr 80px 80px; padding: 10px 16px; background: var(--ink2); color: #e8dfc8; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; }
-.ledger-row { display: grid; grid-template-columns: 1fr 80px 80px; padding: 12px 16px; border-bottom: 1px solid var(--line); align-items: center; animation: slideIn 0.3s ease; }
+.ledger-header { display: grid; grid-template-columns: 1fr auto; padding: 10px 16px; background: var(--ink2); color: #e8dfc8; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.ledger-row { display: grid; grid-template-columns: 1fr auto; padding: 12px 16px; border-bottom: 1px solid var(--line); align-items: center; animation: slideIn 0.3s ease; }
 @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; } }
 .ledger-row:last-child { border-bottom: none; }
 .ledger-row:nth-child(even) { background: rgba(212,201,176,0.15); }
@@ -176,6 +176,101 @@ body {
 .modal ul li { margin-bottom: 4px; }
 .modal table td { vertical-align: top; }
 .modal h3 { font-size: 1.05rem; margin: 16px 0 8px; color: var(--accent); }
+
+.settings-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.settings-row label { font-size: 0.95rem; color: var(--ink2); font-weight: 600; white-space: nowrap; }
+.settings-row input[type="number"] {
+  width: 70px; font-family: 'JetBrains Mono', monospace; font-size: 1rem;
+  padding: 6px 10px; border: 1.5px solid var(--line); border-radius: 8px;
+  background: var(--bg); color: var(--ink); outline: none; text-align: center;
+}
+.settings-row .btn-sm {
+  font-family: 'Crimson Pro', serif; font-size: 0.8rem; font-weight: 600;
+  padding: 6px 12px; border-radius: 6px; border: 1.5px solid var(--accent2);
+  background: var(--paper); color: var(--accent2); cursor: pointer;
+}
+.settings-row .btn-sm:active { background: var(--bg); }
+
+.num-btn.absent {
+  border-color: var(--accent); background: rgba(139,26,26,0.1); color: var(--accent);
+  text-decoration: line-through;
+}
+.num-btn.absent::after {
+  content: '⊘'; position: absolute; top: 1px; right: 3px;
+  font-size: 0.55rem; color: var(--accent); font-weight: 700;
+}
+
+.ledger-row.last-draw { background: rgba(201,147,10,0.12) !important; }
+.ledger-row.last-draw .ledger-num { font-size: 1.5rem; }
+
+.stats-panel {
+  background: var(--paper); border: 1.5px solid var(--line); border-radius: 12px;
+  padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 10px var(--shadow);
+}
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 500px) { .stats-grid { grid-template-columns: 1fr; } }
+.stat-card {
+  background: var(--bg); border-radius: 8px; padding: 12px;
+  border: 1px solid var(--line);
+}
+.stat-card h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+.stat-list { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.8; }
+.stat-list .stat-num { font-weight: 700; }
+.stat-list .stat-count { color: var(--muted); margin-left: 4px; }
+
+/* ── MOBILE RESPONSIVE ── */
+@media (max-width: 420px) {
+  .header {
+    padding: 10px 12px 8px;
+    flex-direction: column; align-items: stretch; gap: 6px;
+  }
+  .header-right { justify-content: center; }
+  .btn-hdr { font-size: 0.7rem; padding: 5px 8px; }
+  .logo { font-size: 1.2rem; text-align: center; }
+  .date-display { text-align: center; font-size: 0.7rem; }
+
+  .numbers-grid { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .num-btn { font-size: 0.85rem; border-radius: 6px; }
+
+  .view { padding: 12px 10px; }
+  .section-title { font-size: 1rem; }
+  .section-sub { font-size: 0.8rem; }
+
+  .draw-stage { padding: 16px 12px; border-radius: 12px; }
+  .draw-numbers { gap: 12px; }
+  .draw-num { font-size: clamp(2.8rem, 14vw, 5rem); }
+  .draw-separator { font-size: 2rem; }
+  .draw-label { font-size: 0.7rem; }
+
+  .draw-btn { font-size: 1.1rem; padding: 12px 20px; border-radius: 10px; }
+  .draw-btn.btn-reset { font-size: 0.9rem; padding: 10px 16px; }
+
+  .pool-stats { font-size: 0.7rem; }
+  .queue-banner { font-size: 0.7rem; padding: 8px 10px; }
+
+  .ledger-header, .ledger-row {
+    grid-template-columns: 1fr auto;
+    font-size: 0.75rem;
+  }
+  .ledger-num { font-size: 1rem; }
+  .ledger-header > div:nth-child(2),
+  .ledger-header > div:nth-child(3),
+  .ledger-row .ledger-num.n1,
+  .ledger-row .ledger-num.n2 { grid-column: span 1; }
+  .ledger-row .ledger-num { grid-column: span 1; }
+
+  .modal { padding: 20px 16px; border-radius: 12px; }
+  .modal h2 { font-size: 1.2rem; }
+  .modal input { font-size: 1rem; padding: 10px 12px; }
+  .modal-btns { gap: 8px; }
+  .modal .btn { font-size: 0.85rem; padding: 8px 14px; }
+
+  .action-buttons { grid-template-columns: repeat(2, 1fr) !important; }
+  .action-buttons .btn-secondary {
+    font-size: 0.75rem; padding: 8px 6px;
+    text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+}
 </style>
 </head>
 <body>
@@ -255,6 +350,36 @@ body {
   </div>
 </div>
 
+<!-- Modal: ustawienia klasy -->
+<div class="modal-bg" id="modalClassSettings">
+  <div class="modal" style="max-width:460px">
+    <h2>⚙️ Ustawienia klasy</h2>
+    <div class="settings-row">
+      <label>Liczba uczniów w puli:</label>
+      <input type="number" id="settingPoolSize" min="1" max="99" value="30">
+    </div>
+    <div class="settings-row">
+      <label>Losuj naraz:</label>
+      <input type="number" id="settingDrawCount" min="1" max="20" value="2">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal('modalClassSettings')">Anuluj</button>
+      <button class="btn btn-primary" onclick="applyClassSettings()">Zapisz</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: statystyki -->
+<div class="modal-bg" id="modalStats">
+  <div class="modal" style="max-width:540px;max-height:80vh;overflow-y:auto">
+    <h2>📊 Statystyki losowań</h2>
+    <div id="statsContent" style="font-size:0.95rem;line-height:1.7;color:var(--ink2)"></div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn btn-primary" onclick="closeModal('modalStats')">Zamknij</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: samouczek -->
 <div class="modal-bg" id="modalTutorial">
   <div class="modal" style="max-width:540px;max-height:80vh;overflow-y:auto">
@@ -325,12 +450,28 @@ body {
           <td style="padding:6px 0">Wczytaj dane z pliku JSON</td>
         </tr>
         <tr style="border-bottom:1px solid var(--line)">
-          <td style="padding:6px 0"><b>❓ Pomoc</b></td>
-          <td style="padding:6px 0">Ten ekran pomocy</td>
+          <td style="padding:6px 0"><b>⚙️ Ustawienia</b></td>
+          <td style="padding:6px 0">Zmień liczbę uczniów i losowanych naraz</td>
         </tr>
         <tr style="border-bottom:1px solid var(--line)">
-          <td style="padding:6px 0"><b>🆕 Aktualizacje</b></td>
-          <td style="padding:6px 0">Historia zmian i nowości w aplikacji</td>
+          <td style="padding:6px 0"><b>📋 Duplikuj</b></td>
+          <td style="padding:6px 0">Skopiuj konfigurację klasy do nowej</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:6px 0"><b>📊 Statystyki</b></td>
+          <td style="padding:6px 0">Zobacz najczęściej/rzadziej losowanych</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:6px 0"><b>↩️ Cofnij</b></td>
+          <td style="padding:6px 0">Cofnij ostatnie losowanie</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:6px 0"><b>Prawy klik</b></td>
+          <td style="padding:6px 0">Oznacz ucznia jako nieobecnego</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:6px 0"><b>Długie przytrzymanie</b></td>
+          <td style="padding:6px 0">Nieobecność (na urządzeniach dotykowych)</td>
         </tr>
       </table>
 
@@ -368,9 +509,26 @@ body {
 </div>
 
 <script>
-const STORAGE_KEY = 'dziennik_v4';
-const APP_VERSION = '1.2';
+const STORAGE_KEY = 'dziennik_v5';
+const BACKUP_KEY = 'dziennik_backup';
+const APP_VERSION = '1.3';
 const UPDATES = [
+  {
+    version: '1.3',
+    date: '2026-03-31',
+    title: 'Duża aktualizacja — nowe funkcje',
+    changes: [
+      'Konfiguracja liczby uczniów w puli (dowolny zakres 1-N)',
+      'Wybór liczby losowanych uczniów naraz (1, 2, 3 lub więcej)',
+      'Cofanie ostatniego losowania (przycisk Undo)',
+      'Statystyki losowań — najczęściej i najrzadziej losowani uczniowie',
+      'Duplikowanie klasy — skopiuj konfigurację do nowej klasy',
+      'Szybka selekcja: zaznacz parzyste / nieparzyste',
+      'Tryb nieobecności — tymczasowe wykluczenie uczniów z losowania',
+      'Wizualne wyróżnienie ostatniego losowania w historii',
+      'Automatyczne kopie zapasowe danych w localStorage'
+    ]
+  },
   {
     version: '1.2',
     date: '2026-03-31',
@@ -415,7 +573,12 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      (parsed.classes || []).forEach(c => { if (!c.drawnQueue) c.drawnQueue = []; });
+      (parsed.classes || []).forEach(c => {
+        if (!c.drawnQueue) c.drawnQueue = [];
+        if (typeof c.poolSize !== 'number') c.poolSize = 30;
+        if (typeof c.drawCount !== 'number') c.drawCount = 2;
+        if (!Array.isArray(c.absent)) c.absent = [];
+      });
       return parsed;
     }
   } catch(e) {}
@@ -423,7 +586,14 @@ function loadState() {
 }
 
 function saveState() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    autoBackup();
+  } catch(e) {}
+}
+
+function autoBackup() {
+  try { localStorage.setItem(BACKUP_KEY, JSON.stringify(state)); } catch(e) {}
 }
 
 function todayStr() {
@@ -480,25 +650,48 @@ function renderViews() {
     view.innerHTML = buildClassView(cls);
     container.appendChild(view);
     view.querySelectorAll('.num-btn').forEach(btn => {
-      btn.onclick = () => toggleNumber(cls.id, parseInt(btn.dataset.n));
+      const n = parseInt(btn.dataset.n);
+      btn.onclick = () => toggleNumber(cls.id, n);
+      btn.oncontextmenu = (e) => { e.preventDefault(); toggleAbsent(cls.id, n); };
+      // Long press for absent on touch
+      let lpTimer;
+      btn.addEventListener('touchstart', (e) => { lpTimer = setTimeout(() => { e.preventDefault(); toggleAbsent(cls.id, n); }, 600); });
+      btn.addEventListener('touchend', () => clearTimeout(lpTimer));
+      btn.addEventListener('touchmove', () => clearTimeout(lpTimer));
     });
   });
   document.getElementById('viewNoClass').className = 'view' + (state.classes.length === 0 ? ' active' : '');
 }
 
 function buildClassView(cls) {
-  const active = cls.pool.filter(p => p.included).map(p => p.n);
+  const poolSize = cls.poolSize || 30;
+  const drawCount = cls.drawCount || 2;
+  const absent = cls.absent || [];
+
+  // Ensure pool matches poolSize
+  while (cls.pool.length < poolSize) {
+    cls.pool.push({n: cls.pool.length + 1, included: true});
+  }
+  if (cls.pool.length > poolSize) {
+    cls.pool = cls.pool.slice(0, poolSize);
+  }
+
+  const active = cls.pool.filter(p => p.included && !absent.includes(p.n)).map(p => p.n);
   const excluded = cls.pool.filter(p => !p.included).map(p => p.n);
   const drawn = cls.drawnQueue || [];
   const remaining = active.filter(n => !drawn.includes(n));
   const exhausted = active.length > 0 && remaining.length === 0;
-  const todayEntry = [...cls.history].reverse().find(h => h.date === todayKey());
+  const todayEntries = cls.history.filter(h => h.date === todayKey());
+  const lastEntry = cls.history.length > 0 ? cls.history[cls.history.length - 1] : null;
 
   // Grid
   let grid = '';
   cls.pool.forEach(p => {
     let c = 'excluded';
-    if (p.included) c = drawn.includes(p.n) ? 'drawn-already' : 'in-pool';
+    if (!p.included) c = 'excluded';
+    else if (absent.includes(p.n)) c = 'absent';
+    else if (drawn.includes(p.n)) c = 'drawn-already';
+    else c = 'in-pool';
     grid += `<button class="num-btn ${c}" data-n="${p.n}">${p.n}</button>`;
   });
 
@@ -510,25 +703,35 @@ function buildClassView(cls) {
     const next = remaining.slice(0,6).join(', ') + (remaining.length > 6 ? '…' : '');
     banner = `<div class="queue-banner state-ok">🎲 Wylosowani: <b>${drawn.length}</b> z ${active.length} &nbsp;·&nbsp; Pozostało: <b>${remaining.length}</b><br>Jeszcze w puli: ${next}</div>`;
   } else {
-    banner = `<div class="queue-banner state-fresh">✓ Nowa runda — wszyscy <b>${active.length}</b> uczniowie z puli czekają na losowanie.</div>`;
+    banner = `<div class="queue-banner state-fresh">✓ Nowa runda — wszyscy <b>${active.length}</b> uczniów z puli czekają na losowanie.</div>`;
   }
 
   // Ledger
   const sorted = [...cls.history].reverse();
   const rows = sorted.length === 0
     ? `<div class="ledger-empty">Brak historii losowań dla tej klasy.</div>`
-    : sorted.map(h => {
+    : sorted.map((h, i) => {
         const isToday = h.date === todayKey();
-        return `<div class="ledger-row">
+        const isLast = (i === 0) && lastEntry && h === lastEntry;
+        const nums = h.nums ? h.nums.join(', ') : `${h.n1}, ${h.n2}`;
+        return `<div class="ledger-row${isLast ? ' last-draw' : ''}">
           <div class="ledger-date">${formatDate(h.date)}${isToday?'<span class="today-badge">dziś</span>':''}</div>
-          <div class="ledger-num n1">${h.n1}</div>
-          <div class="ledger-num n2">${h.n2}</div>
+          <div class="ledger-num n1">${nums}</div>
         </div>`;
       }).join('');
 
-  const canDraw = !exhausted && remaining.length >= 2;
-  const n1d = todayEntry ? todayEntry.n1 : '—';
-  const n2d = todayEntry ? todayEntry.n2 : '—';
+  const canDraw = !exhausted && remaining.length >= drawCount;
+  const lastDrawNums = lastEntry ? (lastEntry.nums ? lastEntry.nums.join(', ') : `${lastEntry.n1}, ${lastEntry.n2}`) : '—';
+  const absentCount = absent.length;
+
+  // Build draw display
+  let drawDisplay = '';
+  if (lastEntry) {
+    const nums = lastEntry.nums || [lastEntry.n1, lastEntry.n2];
+    drawDisplay = nums.map((n, i) => `<div class="draw-num${i % 2 === 1 ? ' second' : ''}">${n}</div>`).join('<div class="draw-separator">·</div>');
+  } else {
+    drawDisplay = Array.from({length: drawCount}, () => '<div class="draw-num">—</div>').join('<div class="draw-separator">·</div>');
+  }
 
   return `
   <div class="section-title">Pula klasy ${esc(cls.name)}</div>
@@ -536,45 +739,52 @@ function buildClassView(cls) {
     Kliknij numer aby włączyć / wyłączyć.&nbsp;
     <span style="color:var(--green)">●</span> aktywny &nbsp;
     <span style="color:var(--drawn)">●</span> już wylosowany &nbsp;
+    <span style="color:var(--accent)">●</span> nieobecny &nbsp;
     <span style="color:var(--muted)">●</span> wykluczony
   </p>
 
   <div class="pool-stats">
-    W puli: <b>${active.length}</b> / 30 &nbsp;·&nbsp;
+    W puli: <b>${active.length}</b> / ${poolSize} &nbsp;·&nbsp;
     Wylosowani: <span class="s-drawn">${drawn.length}</span> &nbsp;·&nbsp;
     Pozostało: <span class="s-left">${remaining.length}</span>
+    ${absentCount > 0 ? ` &nbsp;·&nbsp; <span style="color:var(--accent)">Nieobecni: ${absentCount}</span>` : ''}
     ${excluded.length > 0 ? `<br>Wykluczone nr: ${excluded.join(', ')}` : ''}
   </div>
 
   <div class="numbers-grid">${grid}</div>
 
-  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+  <div class="action-buttons" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:16px">
     <button class="btn btn-secondary" onclick="selectAll('${cls.id}')">Zaznacz wszystkie</button>
     <button class="btn btn-secondary" onclick="deselectAll('${cls.id}')">Odznacz wszystkie</button>
+    <button class="btn btn-secondary" onclick="selectOdd('${cls.id}')">Nieparzyste</button>
+    <button class="btn btn-secondary" onclick="selectEven('${cls.id}')">Parzyste</button>
+    <button class="btn btn-secondary" onclick="openClassSettings('${cls.id}')">⚙️ Ustawienia</button>
+    <button class="btn btn-secondary" onclick="duplicateClass('${cls.id}')">📋 Duplikuj</button>
+    <button class="btn btn-secondary" onclick="openStatsModal('${cls.id}')">📊 Statystyki</button>
   </div>
 
   ${banner}
 
   <div class="section-title">Losowanie</div>
-  <p class="section-sub">Każdy numer losowany jest tylko raz — bez powtórzeń aż do wyczerpania puli.</p>
+  <p class="section-sub">Każdy numer losowany jest tylko raz — bez powtórzeń aż do wyczerpania puli. Losujesz ${drawCount} ${drawCount===1?'ucznia':drawCount<5?'uczniów':'uczniów'} naraz.</p>
 
   <div class="draw-stage">
     <div class="draw-label">Wylosowane numery — ${todayStr()}</div>
     <div class="draw-numbers">
-      <div class="draw-num" id="dn1_${cls.id}">${n1d}</div>
-      <div class="draw-separator">·</div>
-      <div class="draw-num second" id="dn2_${cls.id}">${n2d}</div>
+      ${drawDisplay}
     </div>
-    <div class="draw-date">${todayEntry ? 'Wylosowano dziś' : 'Brak losowania na dziś'}</div>
+    <div class="draw-date">${lastEntry && lastEntry.date === todayKey() ? 'Wylosowano dziś' : 'Brak losowania na dziś'}</div>
   </div>
 
   <button class="draw-btn" ${canDraw ? '' : 'disabled'} onclick="draw('${cls.id}')">
-    ${todayEntry ? 'Losuj ponownie' : 'Losuj dwie liczby'}
+    ${todayEntries.length > 0 ? `Losuj ${drawCount} ${drawCount===1?'ucznia':drawCount<5?'uczniów':'uczniów'} ponownie` : `Losuj ${drawCount} ${drawCount===1?'ucznia':drawCount<5?'uczniów':'uczniów'}`}
   </button>
 
+  ${canUndo(cls.id) ? `<button class="draw-btn btn-reset" onclick="undoLastDraw('${cls.id}')" style="background:var(--accent2);box-shadow:0 4px 20px rgba(26,74,139,0.3)">↩️ Cofnij ostatnie losowanie</button>` : ''}
+
   ${exhausted ? `<button class="draw-btn btn-reset" onclick="resetQueue('${cls.id}')">🔄 Resetuj kolejkę — nowa runda</button>` : ''}
-  ${!exhausted && remaining.length === 1 ? `<p style="color:var(--gold);font-style:italic;font-size:0.9rem;margin-bottom:8px;">⚠️ Tylko 1 numer pozostał — potrzeba minimum 2.</p><button class="draw-btn btn-reset" onclick="resetQueue('${cls.id}')">🔄 Resetuj kolejkę — nowa runda</button>` : ''}
-  ${active.length < 2 ? '<p style="color:var(--accent);font-style:italic;font-size:0.9rem;margin-bottom:8px;">Włącz co najmniej 2 numery do puli.</p>' : ''}
+  ${!exhausted && remaining.length > 0 && remaining.length < drawCount ? `<p style="color:var(--gold);font-style:italic;font-size:0.9rem;margin-bottom:8px;">⚠️ Zostało ${remaining.length} ${remaining.length===1?'numer':'numery'} — potrzeba minimum ${drawCount}.</p><button class="draw-btn btn-reset" onclick="resetQueue('${cls.id}')">🔄 Resetuj kolejkę — nowa runda</button>` : ''}
+  ${active.length < drawCount ? `<p style="color:var(--accent);font-style:italic;font-size:0.9rem;margin-bottom:8px;">Włącz co najmniej ${drawCount} ${drawCount===1?'numer':'numery'} do puli.</p>` : ''}
 
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;margin-top:24px">
     <div class="section-title" style="margin-bottom:0">Historia losowań</div>
@@ -582,7 +792,7 @@ function buildClassView(cls) {
   </div>
   <div class="ledger">
     <div class="ledger-header">
-      <div>Data</div><div style="text-align:center">Nr 1</div><div style="text-align:center">Nr 2</div>
+      <div>Data</div><div>Wylosowane numery</div>
     </div>
     ${rows}
   </div>`;
@@ -596,7 +806,24 @@ function toggleNumber(cid, n) {
   const p = cls.pool.find(p => p.n === n);
   if (!p) return;
   p.included = !p.included;
-  if (!p.included) cls.drawnQueue = cls.drawnQueue.filter(x => x !== n);
+  if (!p.included) {
+    cls.drawnQueue = cls.drawnQueue.filter(x => x !== n);
+    cls.absent = (cls.absent || []).filter(x => x !== n);
+  }
+  saveState(); render();
+}
+
+function toggleAbsent(cid, n) {
+  const cls = state.classes.find(c => c.id === cid);
+  if (!cls.absent) cls.absent = [];
+  const p = cls.pool.find(p => p.n === n);
+  if (!p || !p.included) return;
+  if (cls.absent.includes(n)) {
+    cls.absent = cls.absent.filter(x => x !== n);
+  } else {
+    cls.absent.push(n);
+    cls.drawnQueue = cls.drawnQueue.filter(x => x !== n);
+  }
   saveState(); render();
 }
 
@@ -609,6 +836,91 @@ function deselectAll(cid) {
   const cls = state.classes.find(c=>c.id===cid);
   cls.pool.forEach(p=>p.included=false);
   cls.drawnQueue = [];
+  cls.absent = [];
+  saveState(); render();
+}
+
+function selectOdd(cid) {
+  const cls = state.classes.find(c=>c.id===cid);
+  cls.pool.forEach(p => { p.included = (p.n % 2 === 1); });
+  cls.drawnQueue = cls.drawnQueue.filter(n => n % 2 === 1);
+  cls.absent = (cls.absent||[]).filter(n => n % 2 === 1);
+  saveState(); render();
+}
+
+function selectEven(cid) {
+  const cls = state.classes.find(c=>c.id===cid);
+  cls.pool.forEach(p => { p.included = (p.n % 2 === 0); });
+  cls.drawnQueue = cls.drawnQueue.filter(n => n % 2 === 0);
+  cls.absent = (cls.absent||[]).filter(n => n % 2 === 0);
+  saveState(); render();
+}
+
+let settingsTargetClass = null;
+function openClassSettings(cid) {
+  settingsTargetClass = cid;
+  const cls = state.classes.find(c=>c.id===cid);
+  document.getElementById('settingPoolSize').value = cls.poolSize || 30;
+  document.getElementById('settingDrawCount').value = cls.drawCount || 2;
+  openModal('modalClassSettings');
+}
+
+function applyClassSettings() {
+  if (!settingsTargetClass) return;
+  const cls = state.classes.find(c=>c.id===settingsTargetClass);
+  const newSize = Math.max(1, Math.min(99, parseInt(document.getElementById('settingPoolSize').value) || 30));
+  const newDraw = Math.max(1, Math.min(20, parseInt(document.getElementById('settingDrawCount').value) || 2));
+  cls.poolSize = newSize;
+  cls.drawCount = newDraw;
+  // Adjust pool
+  while (cls.pool.length < newSize) {
+    cls.pool.push({n: cls.pool.length + 1, included: true});
+  }
+  if (cls.pool.length > newSize) {
+    cls.pool = cls.pool.slice(0, newSize);
+    cls.drawnQueue = cls.drawnQueue.filter(n => n <= newSize);
+    cls.absent = (cls.absent||[]).filter(n => n <= newSize);
+  }
+  saveState();
+  closeModal('modalClassSettings');
+  settingsTargetClass = null;
+  render();
+}
+
+function duplicateClass(cid) {
+  const src = state.classes.find(c=>c.id===cid);
+  if (!src) return;
+  const id = 'cls_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+  const newCls = {
+    id,
+    name: src.name + ' (kopia)',
+    pool: JSON.parse(JSON.stringify(src.pool)),
+    poolSize: src.poolSize || 30,
+    drawCount: src.drawCount || 2,
+    history: [],
+    drawnQueue: [],
+    absent: [...(src.absent||[])]
+  };
+  state.classes.push(newCls);
+  state.activeClass = id;
+  saveState(); render();
+}
+
+function canUndo(cid) {
+  const cls = state.classes.find(c=>c.id===cid);
+  if (!cls || cls.history.length === 0) return false;
+  const last = cls.history[cls.history.length - 1];
+  const lastNums = last.nums || [last.n1, last.n2];
+  const dq = cls.drawnQueue || [];
+  return lastNums.every(n => dq.includes(n));
+}
+
+function undoLastDraw(cid) {
+  const cls = state.classes.find(c=>c.id===cid);
+  if (!cls || cls.history.length === 0) return;
+  const last = cls.history.pop();
+  const lastNums = last.nums || [last.n1, last.n2];
+  cls.drawnQueue = cls.drawnQueue.filter(n => !lastNums.includes(n));
   saveState(); render();
 }
 
@@ -619,28 +931,26 @@ function resetQueue(cid) {
 
 function draw(cid) {
   const cls = state.classes.find(c=>c.id===cid);
+  const drawCount = cls.drawCount || 2;
   const drawn = cls.drawnQueue || [];
-  const active = cls.pool.filter(p=>p.included).map(p=>p.n);
+  const absent = cls.absent || [];
+  const active = cls.pool.filter(p=>p.included && !absent.includes(p.n)).map(p=>p.n);
   const remaining = active.filter(n=>!drawn.includes(n));
-  if (remaining.length < 2) return;
+  if (remaining.length < drawCount) return;
 
   const shuffled = [...remaining].sort(() => Math.random() - 0.5);
-  const n1 = shuffled[0], n2 = shuffled[1];
-  cls.drawnQueue = [...drawn, n1, n2];
+  const nums = shuffled.slice(0, drawCount);
+  cls.drawnQueue = [...drawn, ...nums];
 
   const today = todayKey();
-  cls.history.push({date:today, n1, n2});
+  cls.history.push({date:today, nums: nums});
 
   saveState();
 
-  const el1 = document.getElementById('dn1_'+cid);
-  const el2 = document.getElementById('dn2_'+cid);
-  if (el1 && el2) {
-    el1.style.animation = el2.style.animation = 'none';
-    el1.offsetHeight;
-    el1.style.animation = 'popIn 0.4s cubic-bezier(0.34,1.56,0.64,1)';
-    el2.style.animation = 'popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.15s both';
-    el1.textContent = n1; el2.textContent = n2;
+  // Animate
+  const stage = document.querySelector(`#view_${cid} .draw-numbers`);
+  if (stage) {
+    stage.innerHTML = nums.map((n, i) => `<div class="draw-num${i % 2 === 1 ? ' second' : ''}" style="animation-delay:${i*0.15}s">${n}</div>`).join('<div class="draw-separator">·</div>');
   }
   setTimeout(() => render(), 420);
 }
@@ -649,6 +959,64 @@ function clearHistory(cid) {
   if (!confirm('Wyczyścić historię losowań tej klasy?')) return;
   state.classes.find(c=>c.id===cid).history = [];
   saveState(); render();
+}
+
+function openStatsModal(cid) {
+  const cls = state.classes.find(c=>c.id===cid);
+  const container = document.getElementById('statsContent');
+  
+  if (cls.history.length === 0) {
+    container.innerHTML = '<p style="color:var(--muted);font-style:italic;text-align:center;padding:20px">Brak danych statystycznych — wykonaj najpierw losowania.</p>';
+    openModal('modalStats');
+    return;
+  }
+
+  // Count draws per number
+  const counts = {};
+  cls.history.forEach(h => {
+    const nums = h.nums || [h.n1, h.n2];
+    nums.forEach(n => { counts[n] = (counts[n] || 0) + 1; });
+  });
+
+  const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+  const maxDraws = sorted[0] ? sorted[0][1] : 0;
+  const minDraws = sorted[sorted.length-1] ? sorted[sorted.length-1][1] : 0;
+  
+  const mostDrawn = sorted.filter(([n,c]) => c === maxDraws).map(([n]) => n);
+  const leastDrawn = sorted.filter(([n,c]) => c === minDraws).map(([n]) => n);
+  const neverDrawn = cls.pool.filter(p => p.included && !counts[p.n]).map(p => p.n);
+
+  const totalDraws = cls.history.length;
+  const totalNums = Object.values(counts).reduce((a,b)=>a+b, 0);
+
+  container.innerHTML = `
+    <div style="margin-bottom:16px;padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--line)">
+      <p><b>Łącznie losowań:</b> ${totalDraws} rund &nbsp;·&nbsp; <b>Łącznie wylosowanych numerów:</b> ${totalNums}</p>
+    </div>
+    
+    <h3>Najczęściej losowani (${maxDraws}x)</h3>
+    <div class="stat-list" style="margin-bottom:16px">${mostDrawn.map(n => `<span class="stat-num" style="color:var(--accent)">${n}</span>`).join(', ')}</div>
+    
+    <h3>Najrzadziej losowani (${minDraws}x)</h3>
+    <div class="stat-list" style="margin-bottom:16px">${leastDrawn.map(n => `<span class="stat-num" style="color:var(--accent2)">${n}</span>`).join(', ')}</div>
+    
+    ${neverDrawn.length > 0 ? `<h3>Nigdy nie wylosowani</h3><div class="stat-list" style="margin-bottom:16px">${neverDrawn.map(n => `<span class="stat-num" style="color:var(--muted)">${n}</span>`).join(', ')}</div>` : ''}
+    
+    <h3>Szczegóły per numer</h3>
+    <div style="max-height:30vh;overflow-y:auto">
+      ${sorted.map(([n,c]) => {
+        const pct = Math.round(c / totalDraws * 100);
+        return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--line)">
+          <span style="font-family:'JetBrains Mono',monospace;font-weight:700;min-width:30px">${n}</span>
+          <div style="flex:1;height:16px;background:var(--bg);border-radius:4px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:var(--accent);border-radius:4px;min-width:${c>0?4:0}px"></div>
+          </div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--muted);min-width:50px;text-align:right">${c}x (${pct}%)</span>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+  openModal('modalStats');
 }
 
 function deleteClass(cid) {
@@ -714,7 +1082,7 @@ function createClass() {
   names.forEach(name => {
     const id = 'cls_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
     const pool = Array.from({length:30}, (_,i) => ({n:i+1, included:true}));
-    state.classes.push({id, name, pool, history:[], drawnQueue:[]});
+    state.classes.push({id, name, pool, poolSize:30, drawCount:2, history:[], drawnQueue:[], absent:[]});
     lastId = id;
   });
   state.activeClass = lastId;
@@ -728,12 +1096,12 @@ const newClassInput = document.getElementById('newClassName');
 if (newClassInput) newClassInput.addEventListener('keydown', e => { if(e.key==='Enter') createClass(); });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    ['modalNewClass','modalExport','modalImport','modalTutorial','modalHelp','modalManageClasses','modalUpdate'].forEach(id => {
+    ['modalNewClass','modalExport','modalImport','modalTutorial','modalHelp','modalManageClasses','modalUpdate','modalClassSettings','modalStats'].forEach(id => {
       if (document.getElementById(id).classList.contains('open')) closeModal(id);
     });
   }
 });
-['modalNewClass','modalExport','modalImport','modalTutorial','modalHelp','modalManageClasses','modalUpdate'].forEach(id => {
+['modalNewClass','modalExport','modalImport','modalTutorial','modalHelp','modalManageClasses','modalUpdate','modalClassSettings','modalStats'].forEach(id => {
   document.getElementById(id).addEventListener('click', function(e) { if(e.target===this) closeModal(id); });
 });
 
@@ -778,6 +1146,9 @@ function doImport() {
       parsed.classes.forEach(c => {
         if (!c.id || !c.name || !Array.isArray(c.pool) || !Array.isArray(c.history)) throw new Error('Nieprawidłowa struktura klasy');
         if (!c.drawnQueue) c.drawnQueue = [];
+        if (typeof c.poolSize !== 'number') c.poolSize = 30;
+        if (typeof c.drawCount !== 'number') c.drawCount = 2;
+        if (!Array.isArray(c.absent)) c.absent = [];
         c.pool.forEach(p => { if (typeof p.n !== 'number' || typeof p.included !== 'boolean') throw new Error('Nieprawidłowa struktura puli'); });
       });
       if (!confirm(`Import wczyta ${parsed.classes.length} klas(y) i zastąpi bieżące dane. Kontynuować?`)) return;
