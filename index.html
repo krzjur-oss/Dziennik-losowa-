@@ -325,8 +325,12 @@ body {
           <td style="padding:6px 0">Wczytaj dane z pliku JSON</td>
         </tr>
         <tr style="border-bottom:1px solid var(--line)">
-          <td style="padding:6px 0"><b>📖 Samouczek</b></td>
-          <td style="padding:6px 0">Instrukcja obsługi krok po kroku</td>
+          <td style="padding:6px 0"><b>❓ Pomoc</b></td>
+          <td style="padding:6px 0">Ten ekran pomocy</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:6px 0"><b>🆕 Aktualizacje</b></td>
+          <td style="padding:6px 0">Historia zmian i nowości w aplikacji</td>
         </tr>
       </table>
 
@@ -365,8 +369,16 @@ body {
 
 <script>
 const STORAGE_KEY = 'dziennik_v4';
-const APP_VERSION = '1.1';
+const APP_VERSION = '1.2';
 const UPDATES = [
+  {
+    version: '1.2',
+    date: '2026-03-31',
+    title: 'Poprawki dokumentacji',
+    changes: [
+      'Naprawiono tabelę skrótów w pomocy — usunięto nieistniejący przycisk „📖 Samouczek", dodano „❓ Pomoc" i „🆕 Aktualizacje"'
+    ]
+  },
   {
     version: '1.1',
     date: '2026-03-31',
