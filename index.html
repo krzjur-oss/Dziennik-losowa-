@@ -402,6 +402,7 @@ body {
       <h3 style="font-size:1.05rem;margin:16px 0 8px;color:var(--accent)">3. Losowanie</h3>
       <p>Naciśnij duży przycisk <b>„Losuj dwie liczby"</b>. Aplikacja wylosuje 2 numery z puli — każdy uczeń jest losowany tylko raz na rundę.</p>
       <p>Po wyczerpaniu puli pojawi się przycisk <b>„Resetuj kolejkę"</b>, który pozwala zacząć nową rundę.</p>
+      <p>Gdy w puli zostaje mniej uczniów niż ustawiona liczba losowanych (np. ostatni uczeń przy ustawieniu 2), program nadal pozwala wylosować dostępnych uczniów — brakujące pola wypełnia znakiem <b>„-"</b>.</p>
 
       <h3 style="font-size:1.05rem;margin:16px 0 8px;color:var(--accent)">4. Historia losowań</h3>
       <p>Na dole każdej klasy znajduje się dziennik z historią wszystkich losowań — datą i wylosowanymi numerami. Możesz go wyczyścić przyciskiem <b>„Wyczyść historię"</b>.</p>
@@ -484,6 +485,7 @@ body {
 
       <h3 style="font-size:1rem;margin:0 0 8px;color:var(--accent)">Jak działa kolejka?</h3>
       <p>Każdy numer jest losowany <b>dokładnie raz</b> w rundzie. Po wyczerpaniu puli należy zresetować kolejkę, aby rozpocząć nową rundę. Historia losowań jest zachowywana.</p>
+      <p>Jeśli w puli zostaje mniej uczniów niż ustawiona liczba losowanych (np. 1 uczeń przy ustawieniu 2), program nadal pozwala wylosować dostępnych — brakujące pola wypełnia <b>„-"</b>.</p>
 
       <h3 style="font-size:1rem;margin:16px 0 8px;color:var(--accent)">Dane i prywatność</h3>
       <p>Wszystkie dane są przechowywane lokalnie w przeglądarce (<code>localStorage</code>). Nie są wysyłane na żaden serwer.</p>
@@ -511,8 +513,19 @@ body {
 <script>
 const STORAGE_KEY = 'dziennik_v5';
 const BACKUP_KEY = 'dziennik_backup';
-const APP_VERSION = '1.3';
+const APP_VERSION = '1.4';
 const UPDATES = [
+  {
+    version: '1.4',
+    date: '2026-03-31',
+    title: 'Elastyczne losowanie przy nieparzystej liczbie uczniów',
+    changes: [
+      'Gdy w puli zostaje mniej uczniów niż ustawiona liczba losowanych — program nadal pozwala losować',
+      'Brakujące pola są automatycznie wypełniane znakiem „-"',
+      'Przykład: 1 uczeń w puli + ustawione losowanie 2 → wynik: [5, "-"]',
+      'Nie trzeba już resetować kolejki gdy zostaje ostatni uczeń'
+    ]
+  },
   {
     version: '1.3',
     date: '2026-03-31',
@@ -720,7 +733,7 @@ function buildClassView(cls) {
         </div>`;
       }).join('');
 
-  const canDraw = !exhausted && remaining.length >= drawCount;
+  const canDraw = !exhausted && remaining.length > 0;
   const lastDrawNums = lastEntry ? (lastEntry.nums ? lastEntry.nums.join(', ') : `${lastEntry.n1}, ${lastEntry.n2}`) : '—';
   const absentCount = absent.length;
 
@@ -783,7 +796,7 @@ function buildClassView(cls) {
   ${canUndo(cls.id) ? `<button class="draw-btn btn-reset" onclick="undoLastDraw('${cls.id}')" style="background:var(--accent2);box-shadow:0 4px 20px rgba(26,74,139,0.3)">↩️ Cofnij ostatnie losowanie</button>` : ''}
 
   ${exhausted ? `<button class="draw-btn btn-reset" onclick="resetQueue('${cls.id}')">🔄 Resetuj kolejkę — nowa runda</button>` : ''}
-  ${!exhausted && remaining.length > 0 && remaining.length < drawCount ? `<p style="color:var(--gold);font-style:italic;font-size:0.9rem;margin-bottom:8px;">⚠️ Zostało ${remaining.length} ${remaining.length===1?'numer':'numery'} — potrzeba minimum ${drawCount}.</p><button class="draw-btn btn-reset" onclick="resetQueue('${cls.id}')">🔄 Resetuj kolejkę — nowa runda</button>` : ''}
+  ${!exhausted && remaining.length > 0 && remaining.length < drawCount ? `<p style="color:var(--gold);font-style:italic;font-size:0.9rem;margin-bottom:8px;">⚠️ Został tylko ${remaining.length} ${remaining.length===1?'uczeń — zostanie wylosowany':'uczniów — zostaną wylosowani'}${remaining.length===1?', a drugie pole wypełnione „-"':', a pozostałe pola wypełnione „-"'}.</p>` : ''}
   ${active.length < drawCount ? `<p style="color:var(--accent);font-style:italic;font-size:0.9rem;margin-bottom:8px;">Włącz co najmniej ${drawCount} ${drawCount===1?'numer':'numery'} do puli.</p>` : ''}
 
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;margin-top:24px">
@@ -912,7 +925,7 @@ function canUndo(cid) {
   const last = cls.history[cls.history.length - 1];
   const lastNums = last.nums || [last.n1, last.n2];
   const dq = cls.drawnQueue || [];
-  return lastNums.every(n => dq.includes(n));
+  return lastNums.filter(n => n !== '-').every(n => dq.includes(n));
 }
 
 function undoLastDraw(cid) {
@@ -936,11 +949,13 @@ function draw(cid) {
   const absent = cls.absent || [];
   const active = cls.pool.filter(p=>p.included && !absent.includes(p.n)).map(p=>p.n);
   const remaining = active.filter(n=>!drawn.includes(n));
-  if (remaining.length < drawCount) return;
+  if (remaining.length === 0) return;
 
   const shuffled = [...remaining].sort(() => Math.random() - 0.5);
-  const nums = shuffled.slice(0, drawCount);
-  cls.drawnQueue = [...drawn, ...nums];
+  const actualDraw = Math.min(remaining.length, drawCount);
+  const nums = shuffled.slice(0, actualDraw);
+  while (nums.length < drawCount) nums.push('-');
+  cls.drawnQueue = [...drawn, ...nums.filter(n => n !== '-')];
 
   const today = todayKey();
   cls.history.push({date:today, nums: nums});
