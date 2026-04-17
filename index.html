@@ -513,8 +513,18 @@ body {
 <script>
 const STORAGE_KEY = 'dziennik_v5';
 const BACKUP_KEY = 'dziennik_backup';
-const APP_VERSION = '1.4';
+const APP_VERSION = '1.5';
 const UPDATES = [
+  {
+    version: '1.5',
+    date: '2026-04-17',
+    title: 'Szybki reset nieobecności',
+    changes: [
+      'Dodano przycisk „✅ Wszyscy wrócili" — usuwa nieobecność wszystkich uczniów jednym kliknięciem',
+      'Przycisk pojawia się tylko gdy ktoś jest oznaczony jako nieobecny i pokazuje ich liczbę',
+      'Nie trzeba już ręcznie odznaczać każdego ucznia przy nowych zajęciach'
+    ]
+  },
   {
     version: '1.4',
     date: '2026-03-31',
@@ -774,6 +784,7 @@ function buildClassView(cls) {
     <button class="btn btn-secondary" onclick="openClassSettings('${cls.id}')">⚙️ Ustawienia</button>
     <button class="btn btn-secondary" onclick="duplicateClass('${cls.id}')">📋 Duplikuj</button>
     <button class="btn btn-secondary" onclick="openStatsModal('${cls.id}')">📊 Statystyki</button>
+    ${absentCount > 0 ? `<button class="btn" onclick="clearAbsent('${cls.id}')" style="background:var(--accent);color:#fff;border-color:var(--accent)">✅ Wszyscy wrócili (${absentCount})</button>` : ''}
   </div>
 
   ${banner}
@@ -837,6 +848,13 @@ function toggleAbsent(cid, n) {
     cls.absent.push(n);
     cls.drawnQueue = cls.drawnQueue.filter(x => x !== n);
   }
+  saveState(); render();
+}
+
+function clearAbsent(cid) {
+  const cls = state.classes.find(c => c.id === cid);
+  if (!cls) return;
+  cls.absent = [];
   saveState(); render();
 }
 
