@@ -61,6 +61,15 @@ body {
 }
 .btn-hdr:active { background: var(--bg); }
 
+.about-tab {
+  font-family: 'Crimson Pro', serif; font-size: 0.88rem; font-weight: 600;
+  padding: 7px 12px; border: none; background: transparent;
+  color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent;
+  margin-bottom: -2px; transition: all 0.15s; white-space: nowrap;
+}
+.about-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.about-tab:hover:not(.active) { color: var(--ink2); }
+
 .tabs {
   display: flex; background: var(--paper);
   border-bottom: 2px solid var(--line);
@@ -266,7 +275,6 @@ body {
   .modal .btn { font-size: 0.85rem; padding: 8px 14px; }
 
   .action-buttons { grid-template-columns: repeat(2, 1fr) !important; }
-  .action-buttons .btn-secondary {
     font-size: 0.75rem; padding: 8px 6px;
     text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
@@ -283,7 +291,7 @@ body {
     <button class="btn-hdr" onclick="openManageClassesModal()">🗂 Klasy</button>
     <button class="btn-hdr" onclick="openExportModal()">💾 Eksport</button>
     <button class="btn-hdr" onclick="openImportModal()">📂 Import</button>
-    <button class="btn-hdr" onclick="openUpdateModal()">🆕 Aktualizacje</button>
+    <button class="btn-hdr" onclick="openAboutModal()">ℹ️ O aplikacji</button>
   </div>
 </div>
 
@@ -499,13 +507,145 @@ body {
   </div>
 </div>
 
-<!-- Modal: aktualizacje -->
-<div class="modal-bg" id="modalUpdate">
-  <div class="modal" style="max-width:540px;max-height:80vh;overflow-y:auto">
-    <h2>🆕 Aktualizacje</h2>
-    <div id="updateContent" style="font-size:0.95rem;line-height:1.7;color:var(--ink2)"></div>
-    <div class="modal-btns" style="margin-top:16px">
-      <button class="btn btn-primary" onclick="closeModal('modalUpdate')">Zamknij</button>
+<!-- Modal: O aplikacji -->
+<div class="modal-bg" id="modalAbout">
+  <div class="modal" style="max-width:560px;max-height:85vh;display:flex;flex-direction:column">
+    <h2>ℹ️ O aplikacji</h2>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:4px;margin:8px 0 16px;border-bottom:2px solid var(--line);padding-bottom:0">
+      <button class="about-tab active" onclick="switchAboutTab('readme')" id="tab-readme">📖 README</button>
+      <button class="about-tab" onclick="switchAboutTab('updates')" id="tab-updates">🆕 Aktualizacje</button>
+      <button class="about-tab" onclick="switchAboutTab('regulamin')" id="tab-regulamin">📄 Regulamin</button>
+      <button class="about-tab" onclick="switchAboutTab('licencja')" id="tab-licencja">⚖️ Licencja</button>
+    </div>
+
+    <div style="overflow-y:auto;flex:1;font-size:0.92rem;line-height:1.7;color:var(--ink2)">
+
+      <!-- README -->
+      <div id="about-readme">
+        <p style="margin-bottom:12px">Aplikacja PWA do losowania numerów uczniów z dziennika klasowego. Działa w przeglądarce na tablecie i telefonie — bez instalacji, w pełni offline.</p>
+
+        <h3 style="font-size:1rem;color:var(--accent);margin:14px 0 6px">✨ Funkcje</h3>
+        <ul style="margin:0 0 10px 20px">
+          <li>Dowolna liczba klas z osobnymi ustawieniami i historią</li>
+          <li>Konfigurowalny zakres numerów (1–N) dla każdej klasy</li>
+          <li>Tryb nieobecności — tymczasowe wykluczenie uczniów z losowania</li>
+          <li>Przycisk „✅ Wszyscy wrócili" — reset nieobecności jednym kliknięciem</li>
+          <li>Losowanie bez powtórzeń — każdy numer tylko raz na rundę</li>
+          <li>Elastyczne losowanie przy niepełnej puli (brakujące pola → „-")</li>
+          <li>Cofanie ostatniego losowania (↩️)</li>
+          <li>Statystyki najczęściej i najrzadziej losowanych uczniów</li>
+          <li>Duplikowanie klasy i szybka selekcja (nieparzyste / parzyste)</li>
+          <li>Eksport i import danych JSON</li>
+        </ul>
+
+        <h3 style="font-size:1rem;color:var(--accent);margin:14px 0 6px">📱 Instalacja na Androidzie (PWA)</h3>
+        <ol style="margin:0 0 10px 20px">
+          <li>Otwórz <b>Chrome</b> na tablecie lub telefonie</li>
+          <li>Naciśnij menu <b>⋮</b> → <b>„Dodaj do ekranu głównego"</b></li>
+          <li>Od tej chwili działa <b>offline</b>, bez paska przeglądarki</li>
+        </ol>
+        <p style="padding:8px 12px;background:rgba(26,107,58,0.07);border-radius:8px;border:1px solid rgba(26,107,58,0.2)">
+          💡 Dane aplikacji PWA są oddzielone od danych przeglądarki — czyszczenie historii Chrome nie usuwa klas i losowań.
+        </p>
+
+        <h3 style="font-size:1rem;color:var(--accent);margin:14px 0 6px">🔒 Prywatność</h3>
+        <p>Wszystkie dane przechowywane są <b>wyłącznie lokalnie</b> w przeglądarce (<code>localStorage</code>). Żadne dane nie są wysyłane na serwer. Aplikacja nie używa plików cookie ani narzędzi analitycznych.</p>
+
+        <h3 style="font-size:1rem;color:var(--accent);margin:14px 0 6px">🛠️ Technologie</h3>
+        <p>Vanilla HTML / CSS / JavaScript — zero zewnętrznych zależności. PWA z Service Workerem i manifestem.</p>
+
+        <p style="margin-top:16px;color:var(--muted);font-size:0.88rem;border-top:1px solid var(--line);padding-top:12px">
+          Wersja <b id="aboutVersion"></b> · © 2025–2026 Krzysztof Jureczek ·
+          <a href="https://krzjur-oss.github.io/Dziennik-losowa-/" target="_blank" style="color:var(--accent2)">krzjur-oss.github.io</a>
+        </p>
+      </div>
+
+      <!-- Aktualizacje -->
+      <div id="about-updates" style="display:none">
+        <div id="updateContent"></div>
+      </div>
+
+      <!-- Regulamin -->
+      <div id="about-regulamin" style="display:none">
+        <h3 style="font-size:1rem;color:var(--accent);margin:0 0 4px">§1. Postanowienia ogólne</h3>
+        <p style="margin-bottom:10px">Niniejszy Regulamin określa zasady korzystania z aplikacji internetowej <b>Dziennik Losowań</b>. Właścicielem i twórcą Aplikacji jest <b>Krzysztof Jureczek</b>. Korzystanie z Aplikacji jest równoznaczne z akceptacją niniejszego Regulaminu.</p>
+
+        <h3 style="font-size:1rem;color:var(--accent);margin:12px 0 4px">§2. Przeznaczenie</h3>
+        <p style="margin-bottom:10px">Aplikacja przeznaczona jest wyłącznie do <b>niekomercyjnego użytku w placówkach oświatowych</b>. Umożliwia losowe wybieranie uczniów podczas zajęć oraz zarządzanie klasami, pulami numerów i historią losowań.</p>
+
+        <h3 style="font-size:1rem;color:var(--accent);margin:12px 0 4px">§3. Warunki korzystania</h3>
+        <ul style="margin:0 0 10px 20px">
+          <li>Aplikacja jest bezpłatna i dostępna dla każdego z przeglądarką internetową</li>
+          <li>Użytkownik korzysta z Aplikacji zgodnie z jej przeznaczeniem i obowiązującym prawem</li>
+          <li>Zabronione jest użycie komercyjne bez pisemnej zgody Autora</li>
+        </ul>
+
+        <h3 style="font-size:1rem;color:var(--accent);margin:12px 0 4px">§4. Prawa autorskie</h3>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:10px;font-size:0.9rem">
+          <tr style="border-bottom:1px solid var(--line)">
+            <td style="padding:6px 8px 6px 0;width:24px">❌</td>
+            <td style="padding:6px 0"><b>Zabronione:</b> kopiowanie, modyfikowanie, dekompilowanie, rozpowszechnianie lub sprzedaż Aplikacji bez zgody Autora</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 8px 6px 0">✅</td>
+            <td style="padding:6px 0"><b>Dozwolone:</b> korzystanie zgodnie z przeznaczeniem i udostępnianie linku do Aplikacji</td>
+          </tr>
+        </table>
+
+        <h3 style="font-size:1rem;color:var(--accent);margin:12px 0 4px">§5. Dane i prywatność</h3>
+        <p style="margin-bottom:6px">Aplikacja <b>nie zbiera, nie przesyła ani nie przechowuje</b> danych na zewnętrznych serwerach. Dane zapisywane są wyłącznie lokalnie w <code>localStorage</code>:</p>
+        <table style="width:100%;border-collapse:collapse;font-size:0.88rem;margin-bottom:10px">
+          <tr style="background:rgba(212,201,176,0.3)">
+            <td style="padding:5px 8px;font-weight:600;border:1px solid var(--line)">Klucz</td>
+            <td style="padding:5px 8px;font-weight:600;border:1px solid var(--line)">Zawartość</td>
+          </tr>
+          <tr>
+            <td style="padding:5px 8px;border:1px solid var(--line)"><code>dziennik_v5</code></td>
+            <td style="padding:5px 8px;border:1px solid var(--line)">Pełny stan (klasy, pule, historia, nieobecności)</td>
+          </tr>
+          <tr>
+            <td style="padding:5px 8px;border:1px solid var(--line)"><code>dziennik_backup</code></td>
+            <td style="padding:5px 8px;border:1px solid var(--line)">Automatyczna kopia zapasowa stanu</td>
+          </tr>
+        </table>
+
+        <h3 style="font-size:1rem;color:var(--accent);margin:12px 0 4px">§6. Odpowiedzialność</h3>
+        <p style="margin-bottom:10px">Aplikacja udostępniana jest w stanie „takim, jakim jest" (<em>as is</em>), bez gwarancji. Autor nie ponosi odpowiedzialności za utratę danych wynikającą z wyczyszczenia przeglądarki lub awarii urządzenia. Zaleca się regularne tworzenie kopii zapasowych przez <b>💾 Eksport JSON</b>.</p>
+
+        <h3 style="font-size:1rem;color:var(--accent);margin:12px 0 4px">§7–8. Zmiany i postanowienia końcowe</h3>
+        <p>Autor zastrzega prawo do zmiany Regulaminu. W sprawach nieuregulowanych stosuje się przepisy prawa polskiego. Kontakt przez repozytorium GitHub projektu.</p>
+
+        <p style="margin-top:16px;color:var(--muted);font-size:0.88rem;border-top:1px solid var(--line);padding-top:12px">Regulamin v1.0 · obowiązuje od 17 kwietnia 2026 r. · © 2025–2026 Krzysztof Jureczek</p>
+      </div>
+
+      <!-- Licencja -->
+      <div id="about-licencja" style="display:none">
+        <p style="margin-bottom:12px;padding:10px 14px;background:rgba(139,26,26,0.07);border-radius:8px;border:1px solid rgba(139,26,26,0.2)">
+          <b>Copyright (c) 2025–2026 Krzysztof Jureczek. All rights reserved.</b><br>
+          PROJECT NAME: Dziennik Losowań
+        </p>
+
+        <h3 style="font-size:1rem;color:var(--accent);margin:12px 0 4px">1. Własność</h3>
+        <p style="margin-bottom:10px">Wszelkie elementy Aplikacji — interfejs graficzny, kod źródłowy, projekt wizualny, dokumentacja — są chronione prawem własności intelektualnej i należą wyłącznie do Autora.</p>
+
+        <h3 style="font-size:1rem;color:var(--accent);margin:12px 0 4px">2. Ograniczenia użytkowania</h3>
+        <p style="margin-bottom:10px">Niniejsza licencja <b>nie zezwala</b> na kopiowanie, modyfikowanie, łączenie, publikowanie, dystrybucję, sublicencjonowanie ani sprzedaż kopii Aplikacji bez pisemnej zgody Autora.</p>
+
+        <h3 style="font-size:1rem;color:var(--accent);margin:12px 0 4px">3. Użytek osobisty</h3>
+        <p style="margin-bottom:10px">Dozwolone jest korzystanie z Aplikacji wyłącznie zgodnie z jej przeznaczeniem (losowanie uczniów, rejestrowanie nieobecności). Zakazane jest inżynierowanie wsteczne oraz nieautoryzowana reprodukcja kodu źródłowego.</p>
+
+        <h3 style="font-size:1rem;color:var(--accent);margin:12px 0 4px">4. Brak gwarancji</h3>
+        <p style="margin-bottom:10px;font-size:0.88rem;color:var(--muted)">THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE.</p>
+
+        <p style="margin-top:16px;color:var(--muted);font-size:0.88rem;border-top:1px solid var(--line);padding-top:12px">W sprawach licencjonowania komercyjnego — kontakt przez repozytorium GitHub. · © 2025–2026 Krzysztof Jureczek</p>
+      </div>
+
+    </div>
+
+    <div class="modal-btns" style="margin-top:16px;border-top:1px solid var(--line);padding-top:12px">
+      <button class="btn btn-primary" onclick="closeModal('modalAbout')">Zamknij</button>
     </div>
   </div>
 </div>
@@ -513,8 +653,19 @@ body {
 <script>
 const STORAGE_KEY = 'dziennik_v5';
 const BACKUP_KEY = 'dziennik_backup';
-const APP_VERSION = '1.5';
+const APP_VERSION = '1.6';
 const UPDATES = [
+  {
+    version: '1.6',
+    date: '2026-04-17',
+    title: 'Modal „O aplikacji" — README, Regulamin i Licencja w aplikacji',
+    changes: [
+      'Dodano modal „ℹ️ O aplikacji" z czterema zakładkami: README, Aktualizacje, Regulamin, Licencja',
+      'Przycisk „🆕 Aktualizacje" zastąpiony przyciskiem „ℹ️ O aplikacji" w nagłówku',
+      'Regulamin i Licencja dostępne bezpośrednio z poziomu aplikacji bez osobnych plików',
+      'Czerwona plakietka „!" na przycisku informuje o nowej wersji aplikacji'
+    ]
+  },
   {
     version: '1.5',
     date: '2026-04-17',
@@ -1129,12 +1280,12 @@ const newClassInput = document.getElementById('newClassName');
 if (newClassInput) newClassInput.addEventListener('keydown', e => { if(e.key==='Enter') createClass(); });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    ['modalNewClass','modalExport','modalImport','modalTutorial','modalHelp','modalManageClasses','modalUpdate','modalClassSettings','modalStats'].forEach(id => {
+    ['modalNewClass','modalExport','modalImport','modalTutorial','modalHelp','modalManageClasses','modalAbout','modalClassSettings','modalStats'].forEach(id => {
       if (document.getElementById(id).classList.contains('open')) closeModal(id);
     });
   }
 });
-['modalNewClass','modalExport','modalImport','modalTutorial','modalHelp','modalManageClasses','modalUpdate','modalClassSettings','modalStats'].forEach(id => {
+['modalNewClass','modalExport','modalImport','modalTutorial','modalHelp','modalManageClasses','modalAbout','modalClassSettings','modalStats'].forEach(id => {
   document.getElementById(id).addEventListener('click', function(e) { if(e.target===this) closeModal(id); });
 });
 
@@ -1213,23 +1364,33 @@ function renderUpdateContent() {
   `).join('');
 }
 
-function openUpdateModal() {
+function switchAboutTab(tab) {
+  ['readme','updates','regulamin','licencja'].forEach(t => {
+    document.getElementById('about-' + t).style.display = t === tab ? '' : 'none';
+    const btn = document.getElementById('tab-' + t);
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+}
+
+function openAboutModal(tab) {
   renderUpdateContent();
+  document.getElementById('aboutVersion').textContent = APP_VERSION;
+  switchAboutTab(tab || 'readme');
   localStorage.setItem('dziennik_lastSeenVersion', APP_VERSION);
   const badge = document.getElementById('updateBadge');
   if (badge) badge.style.display = 'none';
-  openModal('modalUpdate');
+  openModal('modalAbout');
 }
 
 const lastSeen = localStorage.getItem('dziennik_lastSeenVersion');
 if (!lastSeen || lastSeen !== APP_VERSION) {
-  const helpBtn = document.querySelector('.btn-hdr[onclick="openUpdateModal()"]');
-  if (helpBtn) {
+  const aboutBtn = document.querySelector('.btn-hdr[onclick="openAboutModal()"]');
+  if (aboutBtn) {
     const badge = document.createElement('span');
     badge.id = 'updateBadge';
     badge.style.cssText = 'display:inline-block;background:var(--accent);color:#fff;font-size:0.6rem;border-radius:50%;width:16px;height:16px;line-height:16px;text-align:center;margin-left:4px;vertical-align:middle;font-family:JetBrains Mono,monospace;font-weight:700';
     badge.textContent = '!';
-    helpBtn.appendChild(badge);
+    aboutBtn.appendChild(badge);
   }
 }
 
