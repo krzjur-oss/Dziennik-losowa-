@@ -28,6 +28,29 @@
   --drawn: #c9930a;
 }
 
+body.dark {
+  --bg: #1a1a1f;
+  --paper: #23232b;
+  --ink: #e8e0d0;
+  --ink2: #c4b89a;
+  --muted: #7a7060;
+  --line: #3a3530;
+  --accent: #c0504040;
+  --accent2: #4a7ab5;
+  --green: #2a9a52;
+  --gold: #d4a020;
+  --shadow: rgba(0,0,0,0.35);
+  --drawn: #d4a020;
+  --accent: #c05050;
+}
+
+body.dark {
+  background-image: repeating-linear-gradient(
+    0deg, transparent, transparent 39px,
+    rgba(58,53,48,0.5) 39px, rgba(58,53,48,0.5) 40px
+  );
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -125,6 +148,8 @@ body {
 }
 .action-menu-grid .btn-action:active, .action-menu-grid .btn-action:hover { background: var(--bg); }
 .action-menu-grid .btn-action.danger { color: var(--accent); }
+
+.ham-item-theme { border-top: 2px solid var(--line) !important; color: var(--accent2); }
 
 .about-tab {
   font-family: 'Crimson Pro', serif; font-size: 0.88rem; font-weight: 600;
@@ -360,6 +385,7 @@ body {
         <button class="ham-item" onclick="openExportModal();toggleHamburger()"><span class="ham-icon">💾</span> Eksport</button>
         <button class="ham-item" onclick="openImportModal();toggleHamburger()"><span class="ham-icon">📂</span> Import</button>
         <button class="ham-item" onclick="openAboutModal();toggleHamburger()" id="aboutHamItem"><span class="ham-icon">ℹ️</span> O aplikacji</button>
+        <button class="ham-item ham-item-theme" onclick="toggleDarkMode()" id="themeToggleBtn"><span class="ham-icon" id="themeIcon">🌙</span> <span id="themeLabel">Tryb ciemny</span></button>
       </div>
     </div>
   </div>
@@ -723,8 +749,19 @@ body {
 <script>
 const STORAGE_KEY = 'dziennik_v5';
 const BACKUP_KEY = 'dziennik_backup';
-const APP_VERSION = '1.7';
+const APP_VERSION = '1.8';
 const UPDATES = [
+  {
+    version: '1.8',
+    date: '2026-04-18',
+    title: 'Tryb ciemny',
+    changes: [
+      'Dodano przełącznik trybu ciemnego w hamburger menu (🌙 / ☀️)',
+      'Ciemny motyw dostosowuje wszystkie kolory interfejsu — tło, papier, tekst, akcenty',
+      'Wybór motywu zapisywany w localStorage i przywracany przy kolejnym uruchomieniu',
+      'Przy pierwszym uruchomieniu aplikacja automatycznie wykrywa systemowy tryb ciemny'
+    ]
+  },
   {
     version: '1.7',
     date: '2026-04-18',
@@ -1453,6 +1490,25 @@ document.addEventListener('click', function(e) {
     document.getElementById('hamburgerBtn').classList.remove('open');
   }
 });
+
+// ── DARK MODE ──
+function updateThemeUI(isDark) {
+  document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+  document.getElementById('themeLabel').textContent = isDark ? 'Tryb jasny' : 'Tryb ciemny';
+}
+function toggleDarkMode() {
+  const isDark = document.body.classList.toggle('dark');
+  localStorage.setItem('dziennik_theme', isDark ? 'dark' : 'light');
+  updateThemeUI(isDark);
+}
+// Apply saved theme on load
+(function() {
+  const saved = localStorage.getItem('dziennik_theme');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = saved === 'dark' || (!saved && prefersDark);
+  if (isDark) document.body.classList.add('dark');
+  updateThemeUI(isDark);
+})();
 
 // ── ACTION MENU ──
 function toggleActionMenu(clsId) {
