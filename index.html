@@ -52,7 +52,7 @@ body {
 }
 .logo { font-size: 1.4rem; font-weight: 700; color: var(--accent); letter-spacing: 0.03em; white-space: nowrap; }
 .logo span { color: var(--ink2); font-style: italic; font-weight: 400; }
-.header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.header-right { display: flex; align-items: center; gap: 8px; }
 .date-display { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--muted); }
 .btn-hdr {
   font-family: 'Crimson Pro', serif; font-size: 0.8rem; font-weight: 600;
@@ -60,6 +60,71 @@ body {
   background: var(--paper); color: var(--muted); cursor: pointer; white-space: nowrap;
 }
 .btn-hdr:active { background: var(--bg); }
+
+/* ── HAMBURGER MENU ── */
+.hamburger-btn {
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  gap: 5px; width: 40px; height: 40px; border-radius: 8px;
+  border: 1.5px solid var(--line); background: var(--paper); cursor: pointer;
+  flex-shrink: 0; transition: background 0.15s;
+}
+.hamburger-btn:active { background: var(--bg); }
+.hamburger-btn span {
+  display: block; width: 18px; height: 2px; background: var(--ink2);
+  border-radius: 2px; transition: all 0.2s;
+}
+.hamburger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger-btn.open span:nth-child(2) { opacity: 0; }
+.hamburger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.hamburger-wrapper { position: relative; }
+.hamburger-dropdown {
+  display: none; position: absolute; top: calc(100% + 8px); right: 0;
+  background: var(--paper); border: 1.5px solid var(--line); border-radius: 10px;
+  box-shadow: 0 8px 28px var(--shadow); min-width: 180px; z-index: 300;
+  overflow: hidden;
+}
+.hamburger-dropdown.open { display: block; }
+.ham-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; font-family: 'Crimson Pro', serif; font-size: 0.95rem; font-weight: 600;
+  color: var(--ink2); background: transparent; border: none; width: 100%;
+  text-align: left; cursor: pointer; border-bottom: 1px solid var(--line);
+  transition: background 0.12s;
+}
+.ham-item:last-child { border-bottom: none; }
+.ham-item:active, .ham-item:hover { background: var(--bg); }
+.ham-item .ham-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+
+/* ── ACTION MENU (in class view) ── */
+.action-menu-wrapper { margin-bottom: 16px; }
+.action-menu-toggle {
+  font-family: 'Crimson Pro', serif; font-size: 0.95rem; font-weight: 600;
+  padding: 9px 16px; border-radius: 8px; border: 1.5px solid var(--accent2);
+  background: var(--paper); color: var(--accent2); cursor: pointer;
+  display: flex; align-items: center; gap: 8px; transition: background 0.12s;
+}
+.action-menu-toggle:active { background: var(--bg); }
+.action-menu-toggle .arrow { transition: transform 0.2s; display: inline-block; font-size: 0.7rem; }
+.action-menu-toggle.open .arrow { transform: rotate(180deg); }
+.action-menu-panel {
+  display: none; margin-top: 8px;
+  background: var(--paper); border: 1.5px solid var(--line); border-radius: 10px;
+  box-shadow: 0 4px 16px var(--shadow); overflow: hidden;
+}
+.action-menu-panel.open { display: block; }
+.action-menu-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+  background: var(--line);
+}
+.action-menu-grid .btn-action {
+  font-family: 'Crimson Pro', serif; font-size: 0.9rem; font-weight: 600;
+  padding: 11px 12px; border: none; background: var(--paper);
+  color: var(--ink2); cursor: pointer; text-align: center;
+  transition: background 0.12s; white-space: nowrap;
+}
+.action-menu-grid .btn-action:active, .action-menu-grid .btn-action:hover { background: var(--bg); }
+.action-menu-grid .btn-action.danger { color: var(--accent); }
 
 .about-tab {
   font-family: 'Crimson Pro', serif; font-size: 0.88rem; font-weight: 600;
@@ -274,10 +339,8 @@ body {
   .modal-btns { gap: 8px; }
   .modal .btn { font-size: 0.85rem; padding: 8px 14px; }
 
-  .action-buttons { grid-template-columns: repeat(2, 1fr) !important; }
-    font-size: 0.75rem; padding: 8px 6px;
-    text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
+  .action-menu-toggle { font-size: 0.85rem; padding: 8px 12px; }
+  .action-menu-grid .btn-action { font-size: 0.8rem; padding: 10px 8px; }
 }
 </style>
 </head>
@@ -287,11 +350,18 @@ body {
   <div class="logo">Dziennik <span>Losowania</span></div>
   <div class="header-right">
     <div class="date-display" id="headerDate"></div>
-    <button class="btn-hdr" onclick="openHelpModal()">❓ Pomoc</button>
-    <button class="btn-hdr" onclick="openManageClassesModal()">🗂 Klasy</button>
-    <button class="btn-hdr" onclick="openExportModal()">💾 Eksport</button>
-    <button class="btn-hdr" onclick="openImportModal()">📂 Import</button>
-    <button class="btn-hdr" onclick="openAboutModal()">ℹ️ O aplikacji</button>
+    <div class="hamburger-wrapper" id="hamburgerWrapper">
+      <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleHamburger()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="hamburger-dropdown" id="hamburgerDropdown">
+        <button class="ham-item" onclick="openHelpModal();toggleHamburger()"><span class="ham-icon">❓</span> Pomoc</button>
+        <button class="ham-item" onclick="openManageClassesModal();toggleHamburger()"><span class="ham-icon">🗂</span> Klasy</button>
+        <button class="ham-item" onclick="openExportModal();toggleHamburger()"><span class="ham-icon">💾</span> Eksport</button>
+        <button class="ham-item" onclick="openImportModal();toggleHamburger()"><span class="ham-icon">📂</span> Import</button>
+        <button class="ham-item" onclick="openAboutModal();toggleHamburger()" id="aboutHamItem"><span class="ham-icon">ℹ️</span> O aplikacji</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -653,8 +723,19 @@ body {
 <script>
 const STORAGE_KEY = 'dziennik_v5';
 const BACKUP_KEY = 'dziennik_backup';
-const APP_VERSION = '1.6';
+const APP_VERSION = '1.7';
 const UPDATES = [
+  {
+    version: '1.7',
+    date: '2026-04-18',
+    title: 'Uproszczony interfejs — hamburger menu i zwijane akcje',
+    changes: [
+      'Przyciski nagłówka (Pomoc, Klasy, Eksport, Import, O aplikacji) przeniesione do hamburger menu ☰',
+      'Przyciski akcji klasy (Zaznacz/Odznacz, Nieparzyste, Parzyste, Ustawienia, Duplikuj, Statystyki) zebrane w zwijane menu „⚙️ Akcje klasy"',
+      'Nagłówek jest teraz znacznie bardziej kompaktowy — lepsza ergonomia na telefonie',
+      'Hamburger menu zamyka się automatycznie po kliknięciu poza nim'
+    ]
+  },
   {
     version: '1.6',
     date: '2026-04-17',
@@ -927,15 +1008,22 @@ function buildClassView(cls) {
 
   <div class="numbers-grid">${grid}</div>
 
-  <div class="action-buttons" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:16px">
-    <button class="btn btn-secondary" onclick="selectAll('${cls.id}')">Zaznacz wszystkie</button>
-    <button class="btn btn-secondary" onclick="deselectAll('${cls.id}')">Odznacz wszystkie</button>
-    <button class="btn btn-secondary" onclick="selectOdd('${cls.id}')">Nieparzyste</button>
-    <button class="btn btn-secondary" onclick="selectEven('${cls.id}')">Parzyste</button>
-    <button class="btn btn-secondary" onclick="openClassSettings('${cls.id}')">⚙️ Ustawienia</button>
-    <button class="btn btn-secondary" onclick="duplicateClass('${cls.id}')">📋 Duplikuj</button>
-    <button class="btn btn-secondary" onclick="openStatsModal('${cls.id}')">📊 Statystyki</button>
-    ${absentCount > 0 ? `<button class="btn" onclick="clearAbsent('${cls.id}')" style="background:var(--accent);color:#fff;border-color:var(--accent)">✅ Wszyscy wrócili (${absentCount})</button>` : ''}
+  <div class="action-menu-wrapper">
+    <button class="action-menu-toggle" id="actionToggle_${cls.id}" onclick="toggleActionMenu('${cls.id}')">
+      ⚙️ Akcje klasy <span class="arrow">▼</span>
+    </button>
+    <div class="action-menu-panel" id="actionPanel_${cls.id}">
+      <div class="action-menu-grid">
+        <button class="btn-action" onclick="selectAll('${cls.id}')">✅ Zaznacz wszystkie</button>
+        <button class="btn-action" onclick="deselectAll('${cls.id}')">☐ Odznacz wszystkie</button>
+        <button class="btn-action" onclick="selectOdd('${cls.id}')">① Nieparzyste</button>
+        <button class="btn-action" onclick="selectEven('${cls.id}')">② Parzyste</button>
+        <button class="btn-action" onclick="openClassSettings('${cls.id}')">⚙️ Ustawienia</button>
+        <button class="btn-action" onclick="duplicateClass('${cls.id}')">📋 Duplikuj</button>
+        <button class="btn-action" onclick="openStatsModal('${cls.id}')">📊 Statystyki</button>
+        ${absentCount > 0 ? `<button class="btn-action danger" onclick="clearAbsent('${cls.id}')">✅ Wszyscy wrócili (${absentCount})</button>` : ''}
+      </div>
+    </div>
   </div>
 
   ${banner}
@@ -1351,6 +1439,30 @@ function doImport() {
   reader.readAsText(file);
 }
 
+// ── HAMBURGER MENU ──
+function toggleHamburger() {
+  const btn = document.getElementById('hamburgerBtn');
+  const dropdown = document.getElementById('hamburgerDropdown');
+  const isOpen = dropdown.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+}
+document.addEventListener('click', function(e) {
+  const wrapper = document.getElementById('hamburgerWrapper');
+  if (wrapper && !wrapper.contains(e.target)) {
+    document.getElementById('hamburgerDropdown').classList.remove('open');
+    document.getElementById('hamburgerBtn').classList.remove('open');
+  }
+});
+
+// ── ACTION MENU ──
+function toggleActionMenu(clsId) {
+  const toggle = document.getElementById('actionToggle_' + clsId);
+  const panel = document.getElementById('actionPanel_' + clsId);
+  if (!toggle || !panel) return;
+  const isOpen = panel.classList.toggle('open');
+  toggle.classList.toggle('open', isOpen);
+}
+
 render();
 
 // ── UPDATE NOTIFICATION ──
@@ -1384,13 +1496,13 @@ function openAboutModal(tab) {
 
 const lastSeen = localStorage.getItem('dziennik_lastSeenVersion');
 if (!lastSeen || lastSeen !== APP_VERSION) {
-  const aboutBtn = document.querySelector('.btn-hdr[onclick="openAboutModal()"]');
-  if (aboutBtn) {
+  const aboutHamItem = document.getElementById('aboutHamItem');
+  if (aboutHamItem) {
     const badge = document.createElement('span');
     badge.id = 'updateBadge';
     badge.style.cssText = 'display:inline-block;background:var(--accent);color:#fff;font-size:0.6rem;border-radius:50%;width:16px;height:16px;line-height:16px;text-align:center;margin-left:4px;vertical-align:middle;font-family:JetBrains Mono,monospace;font-weight:700';
     badge.textContent = '!';
-    aboutBtn.appendChild(badge);
+    aboutHamItem.appendChild(badge);
   }
 }
 
