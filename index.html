@@ -258,7 +258,7 @@ body {
 .ledger-empty { padding: 32px; text-align: center; color: var(--muted); font-style: italic; font-size: 1.05rem; }
 .today-badge { display: inline-block; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; background: var(--gold); color: #fff; border-radius: 4px; padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
 
-.modal-bg { display: none; position: fixed; inset: 0; background: rgba(26,18,8,0.6); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(26,18,8,0.6); z-index: 200; align-items: center; justify-content: center; padding: 12px; }
 .modal-bg.open { display: flex; }
 .modal { background: var(--paper); border: 2px solid var(--line); border-radius: 16px; padding: 28px 24px; width: 100%; max-width: 460px; box-shadow: 0 8px 40px rgba(26,18,8,0.3); }
 .modal h2 { font-size: 1.4rem; font-weight: 700; color: var(--ink); margin-bottom: 16px; }
@@ -605,18 +605,20 @@ body {
 
 <!-- Modal: O aplikacji -->
 <div class="modal-bg" id="modalAbout">
-  <div class="modal" style="max-width:560px;max-height:85vh;display:flex;flex-direction:column">
-    <h2>ℹ️ O aplikacji</h2>
+  <div class="modal" style="max-width:560px;height:88vh;max-height:88vh;display:flex;flex-direction:column;padding:0;overflow:hidden">
+    <div style="padding:20px 20px 0;flex-shrink:0">
+      <h2 style="margin-bottom:12px">ℹ️ O aplikacji</h2>
 
-    <!-- Tabs -->
-    <div style="display:flex;gap:4px;margin:8px 0 16px;border-bottom:2px solid var(--line);padding-bottom:0">
-      <button class="about-tab active" onclick="switchAboutTab('readme')" id="tab-readme">📖 README</button>
-      <button class="about-tab" onclick="switchAboutTab('updates')" id="tab-updates">🆕 Aktualizacje</button>
-      <button class="about-tab" onclick="switchAboutTab('regulamin')" id="tab-regulamin">📄 Regulamin</button>
-      <button class="about-tab" onclick="switchAboutTab('licencja')" id="tab-licencja">⚖️ Licencja</button>
+      <!-- Tabs -->
+      <div style="display:flex;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch;border-bottom:2px solid var(--line);scrollbar-width:none">
+        <button class="about-tab active" onclick="switchAboutTab('readme')" id="tab-readme">📖 README</button>
+        <button class="about-tab" onclick="switchAboutTab('updates')" id="tab-updates">🆕 Aktualizacje</button>
+        <button class="about-tab" onclick="switchAboutTab('regulamin')" id="tab-regulamin">📄 Regulamin</button>
+        <button class="about-tab" onclick="switchAboutTab('licencja')" id="tab-licencja">⚖️ Licencja</button>
+      </div>
     </div>
 
-    <div style="overflow-y:auto;flex:1;font-size:0.92rem;line-height:1.7;color:var(--ink2)">
+    <div style="overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;font-size:0.92rem;line-height:1.7;color:var(--ink2);padding:16px 20px">
 
       <!-- README -->
       <div id="about-readme">
@@ -740,7 +742,7 @@ body {
 
     </div>
 
-    <div class="modal-btns" style="margin-top:16px;border-top:1px solid var(--line);padding-top:12px">
+    <div class="modal-btns" style="flex-shrink:0;border-top:1px solid var(--line);padding:12px 20px">
       <button class="btn btn-primary" onclick="closeModal('modalAbout')">Zamknij</button>
     </div>
   </div>
@@ -749,8 +751,18 @@ body {
 <script>
 const STORAGE_KEY = 'dziennik_v5';
 const BACKUP_KEY = 'dziennik_backup';
-const APP_VERSION = '1.8';
+const APP_VERSION = '1.9';
 const UPDATES = [
+  {
+    version: '1.9',
+    date: '2026-04-18',
+    title: 'Poprawki modalu „O aplikacji" na urządzeniach mobilnych',
+    changes: [
+      'Naprawiono scrollowanie treści w pionie — tytuł, zakładki i przycisk „Zamknij" są teraz zablokowane, a treść scrolluje niezależnie',
+      'Zakładki (README, Aktualizacje, Regulamin, Licencja) scrollują poziomo gdy nie mieszczą się w jednej linii',
+      'Modal zajmuje teraz 88% wysokości ekranu z mniejszymi marginesami — więcej miejsca na treść na małych ekranach'
+    ]
+  },
   {
     version: '1.8',
     date: '2026-04-18',
