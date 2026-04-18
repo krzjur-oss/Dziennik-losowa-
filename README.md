@@ -15,7 +15,6 @@ Aplikacja PWA do losowania numerów uczniów z dziennika klasowego. Działa w pr
 - Konfigurowalny zakres numerów (1–N) dla każdej klasy osobno
 - Możliwość wykluczenia numerów uczniów nieuczęszczających na zajęcia
 - Tryb nieobecności — tymczasowe wykluczenie uczniów z losowania bez usuwania ich z puli
-- Przyciski „Zaznacz wszystkie" / „Odznacz wszystkie" / „Nieparzyste" / „Parzyste"
 - **Przycisk „✅ Wszyscy wrócili"** — usuwa nieobecność wszystkich uczniów jednym kliknięciem (pojawia się gdy ktoś jest oznaczony jako nieobecny)
 
 ### Losowanie
@@ -45,12 +44,17 @@ Aplikacja PWA do losowania numerów uczniów z dziennika klasowego. Działa w pr
 - **💾 Eksport** — pobiera plik JSON ze wszystkimi danymi
 - **📂 Import** — wczytuje wcześniej zapisany plik JSON i przywraca wszystkie dane
 - Automatyczna kopia zapasowa w localStorage
-- Zabezpiecza przed utratą danych przy czyszczeniu przeglądarki
 
-### Samouczek i pomoc
+### Interfejs
+- **☰ Hamburger menu** — wszystkie opcje nagłówka (Pomoc, Klasy, Eksport, Import, O aplikacji) zebrane w jednym miejscu
+- **⚙️ Zwijane menu „Akcje klasy"** — przyciski selekcji, ustawień, duplikowania i statystyk schowane w rozwijanym panelu
+- **🌙 Tryb ciemny** — przełącznik w hamburger menu; wybór zapamiętywany między sesjami, automatyczne wykrywanie systemowego motywu
+- Modal **ℹ️ O aplikacji** z zakładkami README, Aktualizacje, Regulamin i Licencja — w pełni scrollowalny na urządzeniach mobilnych
+
+### Pomoc
 - Interaktywny samouczek krok po kroku uruchamia się automatycznie przy pierwszym użyciu
-- Przycisk **❓ Pomoc** w nagłówku otwiera instrukcję w dowolnym momencie
-- Przycisk **🆕 Aktualizacje** pokazuje historię zmian aplikacji
+- Przycisk **❓ Pomoc** w menu otwiera instrukcję w dowolnym momencie
+- Historia zmian dostępna w zakładce **🆕 Aktualizacje** w „O aplikacji"
 
 ---
 
@@ -82,5 +86,5 @@ Wszystkie dane (klasy, pule numerów, historia losowań, nieobecności) przechow
 
 ## 📄 Licencja
 
-© 2025–2026 Krzysztof Jureczek · Wszelkie prawa zastrzeżone.
+© 2025–2026 Krzysztof Jureczek · Wszelkie prawa zastrzeżone.  
 Szczegóły w pliku [LICENSE](LICENSE) oraz [REGULAMIN](REGULAMIN.md).
