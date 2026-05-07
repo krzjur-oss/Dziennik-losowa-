@@ -42,6 +42,7 @@ body.dark {
   --shadow: rgba(0,0,0,0.35);
   --drawn: #d4a020;
   --accent: #c05050;
+  --accent2: #1a4a8b;
 }
 
 body.dark {
@@ -297,6 +298,14 @@ body {
 .num-btn.absent::after {
   content: '⊘'; position: absolute; top: 1px; right: 3px;
   font-size: 0.55rem; color: var(--accent); font-weight: 700;
+}
+.num-btn.volunteered {
+  border-color: var(--accent2); background: rgba(26,74,139,0.12); color: var(--accent2);
+  font-weight: 700;
+}
+.num-btn.volunteered::after {
+  content: '✋'; position: absolute; top: 1px; right: 3px;
+  font-size: 0.55rem; color: var(--accent2); font-weight: 700;
 }
 
 .ledger-row.last-draw { background: rgba(201,147,10,0.12) !important; }
@@ -751,8 +760,21 @@ body {
 <script>
 const STORAGE_KEY = 'dziennik_v5';
 const BACKUP_KEY = 'dziennik_backup';
-const APP_VERSION = '1.9';
+const APP_VERSION = '2.0';
 const UPDATES = [
+  {
+    version: '2.0',
+    date: '2026-05-07',
+    title: 'Zgłaszanie się do odpowiedzi',
+    changes: [
+      'Dodano możliwość oznaczania uczniów którzy sami zgłosili się do odpowiedzi — podwójne kliknięcie na numer',
+      'Uczniowie zgłoszeni są wizualnie wyróżnieni (niebieskie tło, emoji ✋) i wykluczeni z losowania',
+      'Licznik zgłoszonych w statystykach puli klasy',
+      'Przycisk „🙋 Wyczyść zgłoszonych" w menu akcji klasy (pojawia się gdy ktoś jest zgłoszony)',
+      'Zgłoszeni są automatycznie usuwani przy resetowaniu puli (Odznacz wszystkie, Parzyste, Nieparzyste)',
+      'Nie można oznaczyć jako zgłoszonego ucznia który jest nieobecny'
+    ]
+  },
   {
     version: '1.9',
     date: '2026-04-18',
@@ -882,6 +904,7 @@ function loadState() {
         if (typeof c.poolSize !== 'number') c.poolSize = 30;
         if (typeof c.drawCount !== 'number') c.drawCount = 2;
         if (!Array.isArray(c.absent)) c.absent = [];
+        if (!Array.isArray(c.volunteered)) c.volunteered = [];
       });
       return parsed;
     }
@@ -956,6 +979,7 @@ function renderViews() {
     view.querySelectorAll('.num-btn').forEach(btn => {
       const n = parseInt(btn.dataset.n);
       btn.onclick = () => toggleNumber(cls.id, n);
+      btn.ondblclick = () => toggleVolunteered(cls.id, n);
       btn.oncontextmenu = (e) => { e.preventDefault(); toggleAbsent(cls.id, n); };
       // Long press for absent on touch
       let lpTimer;
@@ -971,6 +995,7 @@ function buildClassView(cls) {
   const poolSize = cls.poolSize || 30;
   const drawCount = cls.drawCount || 2;
   const absent = cls.absent || [];
+  const volunteered = cls.volunteered || [];
 
   // Ensure pool matches poolSize
   while (cls.pool.length < poolSize) {
@@ -980,7 +1005,7 @@ function buildClassView(cls) {
     cls.pool = cls.pool.slice(0, poolSize);
   }
 
-  const active = cls.pool.filter(p => p.included && !absent.includes(p.n)).map(p => p.n);
+  const active = cls.pool.filter(p => p.included && !absent.includes(p.n) && !volunteered.includes(p.n)).map(p => p.n);
   const excluded = cls.pool.filter(p => !p.included).map(p => p.n);
   const drawn = cls.drawnQueue || [];
   const remaining = active.filter(n => !drawn.includes(n));
@@ -994,6 +1019,7 @@ function buildClassView(cls) {
     let c = 'excluded';
     if (!p.included) c = 'excluded';
     else if (absent.includes(p.n)) c = 'absent';
+    else if (volunteered.includes(p.n)) c = 'volunteered';
     else if (drawn.includes(p.n)) c = 'drawn-already';
     else c = 'in-pool';
     grid += `<button class="num-btn ${c}" data-n="${p.n}">${p.n}</button>`;
@@ -1040,9 +1066,10 @@ function buildClassView(cls) {
   return `
   <div class="section-title">Pula klasy ${esc(cls.name)}</div>
   <p class="section-sub">
-    Kliknij numer aby włączyć / wyłączyć.&nbsp;
+    Kliknij numer aby włączyć / wyłączyć. Podwójne kliknięcie = zgłosił się sam.&nbsp;
     <span style="color:var(--green)">●</span> aktywny &nbsp;
     <span style="color:var(--drawn)">●</span> już wylosowany &nbsp;
+    <span style="color:var(--accent2)">●</span> zgłosił się &nbsp;
     <span style="color:var(--accent)">●</span> nieobecny &nbsp;
     <span style="color:var(--muted)">●</span> wykluczony
   </p>
@@ -1052,6 +1079,7 @@ function buildClassView(cls) {
     Wylosowani: <span class="s-drawn">${drawn.length}</span> &nbsp;·&nbsp;
     Pozostało: <span class="s-left">${remaining.length}</span>
     ${absentCount > 0 ? ` &nbsp;·&nbsp; <span style="color:var(--accent)">Nieobecni: ${absentCount}</span>` : ''}
+    ${volunteered.length > 0 ? ` &nbsp;·&nbsp; <span style="color:var(--accent2)">Zgłosili się: ${volunteered.length}</span>` : ''}
     ${excluded.length > 0 ? `<br>Wykluczone nr: ${excluded.join(', ')}` : ''}
   </div>
 
@@ -1071,6 +1099,7 @@ function buildClassView(cls) {
         <button class="btn-action" onclick="duplicateClass('${cls.id}')">📋 Duplikuj</button>
         <button class="btn-action" onclick="openStatsModal('${cls.id}')">📊 Statystyki</button>
         ${absentCount > 0 ? `<button class="btn-action danger" onclick="clearAbsent('${cls.id}')">✅ Wszyscy wrócili (${absentCount})</button>` : ''}
+        ${volunteered.length > 0 ? `<button class="btn-action" onclick="clearVolunteered('${cls.id}')" style="background:rgba(26,74,139,0.1);color:var(--accent2)">🙋 Wyczyść zgłoszonych (${volunteered.length})</button>` : ''}
       </div>
     </div>
   </div>
@@ -1135,6 +1164,25 @@ function toggleAbsent(cid, n) {
   } else {
     cls.absent.push(n);
     cls.drawnQueue = cls.drawnQueue.filter(x => x !== n);
+    // Jeśli ktoś jest nieobecny, nie może być zgłoszony
+    cls.volunteered = (cls.volunteered || []).filter(x => x !== n);
+  }
+  saveState(); render();
+}
+
+function toggleVolunteered(cid, n) {
+  const cls = state.classes.find(c => c.id === cid);
+  if (!cls.volunteered) cls.volunteered = [];
+  const p = cls.pool.find(p => p.n === n);
+  if (!p || !p.included) return;
+  // Nie może być zgłoszony jeśli jest nieobecny
+  if ((cls.absent || []).includes(n)) return;
+  
+  if (cls.volunteered.includes(n)) {
+    cls.volunteered = cls.volunteered.filter(x => x !== n);
+  } else {
+    cls.volunteered.push(n);
+    cls.drawnQueue = cls.drawnQueue.filter(x => x !== n);
   }
   saveState(); render();
 }
@@ -1143,6 +1191,13 @@ function clearAbsent(cid) {
   const cls = state.classes.find(c => c.id === cid);
   if (!cls) return;
   cls.absent = [];
+  saveState(); render();
+}
+
+function clearVolunteered(cid) {
+  const cls = state.classes.find(c => c.id === cid);
+  if (!cls) return;
+  cls.volunteered = [];
   saveState(); render();
 }
 
@@ -1156,6 +1211,7 @@ function deselectAll(cid) {
   cls.pool.forEach(p=>p.included=false);
   cls.drawnQueue = [];
   cls.absent = [];
+  cls.volunteered = [];
   saveState(); render();
 }
 
@@ -1164,6 +1220,7 @@ function selectOdd(cid) {
   cls.pool.forEach(p => { p.included = (p.n % 2 === 1); });
   cls.drawnQueue = cls.drawnQueue.filter(n => n % 2 === 1);
   cls.absent = (cls.absent||[]).filter(n => n % 2 === 1);
+  cls.volunteered = (cls.volunteered||[]).filter(n => n % 2 === 1);
   saveState(); render();
 }
 
@@ -1172,6 +1229,7 @@ function selectEven(cid) {
   cls.pool.forEach(p => { p.included = (p.n % 2 === 0); });
   cls.drawnQueue = cls.drawnQueue.filter(n => n % 2 === 0);
   cls.absent = (cls.absent||[]).filter(n => n % 2 === 0);
+  cls.volunteered = (cls.volunteered||[]).filter(n => n % 2 === 0);
   saveState(); render();
 }
 
@@ -1470,6 +1528,7 @@ function doImport() {
         if (typeof c.poolSize !== 'number') c.poolSize = 30;
         if (typeof c.drawCount !== 'number') c.drawCount = 2;
         if (!Array.isArray(c.absent)) c.absent = [];
+        if (!Array.isArray(c.volunteered)) c.volunteered = [];
         c.pool.forEach(p => { if (typeof p.n !== 'number' || typeof p.included !== 'boolean') throw new Error('Nieprawidłowa struktura puli'); });
       });
       if (!confirm(`Import wczyta ${parsed.classes.length} klas(y) i zastąpi bieżące dane. Kontynuować?`)) return;
