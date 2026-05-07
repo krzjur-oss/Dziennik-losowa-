@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Losowanie">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="./manifest.json">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap');
 
@@ -1642,8 +1642,26 @@ if (!localStorage.getItem('dziennik_visited')) {
 // ── SERVICE WORKER (PWA) ──
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .catch(() => navigator.serviceWorker.register('sw.js'));
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => {
+        console.log('✅ Service Worker registered:', reg.scope);
+        
+        // Check for updates
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          console.log('🔄 Service Worker update found');
+          
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('✨ New version available - refresh to update');
+              // Optionally show update notification to user
+            }
+          });
+        });
+      })
+      .catch(err => {
+        console.error('❌ Service Worker registration failed:', err);
+      });
   });
 }
 </script>
