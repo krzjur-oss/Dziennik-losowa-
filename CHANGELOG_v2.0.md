@@ -179,14 +179,27 @@ const active = cls.pool
 23. ✅ Dodano update detection w Service Worker registration
 24. ✅ Zaktualizowano link do manifestu na `./manifest.json`
 
+### 🔄 Mechanizm automatycznej aktualizacji:
+25. ✅ Dodano wykrywanie aktualizacji Service Workera (updatefound event)
+26. ✅ Dodano okresowe sprawdzanie aktualizacji (co 60 sekund)
+27. ✅ Dodano automatyczne przeładowanie po aktualizacji (controllerchange)
+28. ✅ Dodano przyjazne powiadomienie: "🎉 Nowa wersja dostępna!" z przyciskiem
+29. ✅ Dodano wykrywanie aktualizacji przez porównanie wersji w localStorage
+30. ✅ Dodano powiadomienie po zakończonej aktualizacji: "Zaktualizowano do wersji X"
+31. ✅ Dodano przycisk "🔄 Sprawdź aktualizacje" w modalu "O aplikacji"
+32. ✅ Dodano funkcję checkForUpdates() - ręczne wymuszenie sprawdzenia
+33. ✅ Dodano automatyczne czyszczenie starego cache przy aktualizacji wersji
+
 ### 📝 Dokumentacja:
-25. ✅ Zaktualizowano README w modalu "O aplikacji"
-26. ✅ Zaktualizowano samouczek (Tutorial)
-27. ✅ Zaktualizowano modal pomocy (Help)
-28. ✅ Zaktualizowano regulamin (localStorage - dodano "zgłoszenia")
-29. ✅ Rozszerzono wpis v2.0 w tablicy UPDATES
-30. ✅ Zaktualizowano README.md
-31. ✅ Utworzono dokumentację naprawy PWA dla Samsungów
+34. ✅ Zaktualizowano README w modalu "O aplikacji"
+35. ✅ Zaktualizowano samouczek (Tutorial)
+36. ✅ Zaktualizowano modal pomocy (Help)
+37. ✅ Zaktualizowano regulamin (localStorage - dodano "zgłoszenia")
+38. ✅ Rozszerzono wpis v2.0 w tablicy UPDATES
+39. ✅ Zaktualizowano README.md
+40. ✅ Przetłumaczono licencję na język polski
+41. ✅ Utworzono dokumentację naprawy PWA dla Samsungów
+42. ✅ Utworzono dokumentację mechanizmu auto-update
 
 ---
 

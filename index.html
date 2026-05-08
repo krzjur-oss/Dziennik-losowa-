@@ -687,9 +687,21 @@ body {
         <h3 style="font-size:1rem;color:var(--accent);margin:14px 0 6px">🛠️ Technologie</h3>
         <p>Vanilla HTML / CSS / JavaScript — zero zewnętrznych zależności. PWA z Service Workerem i manifestem.</p>
 
-        <p style="margin-top:16px;color:var(--muted);font-size:0.88rem;border-top:1px solid var(--line);padding-top:12px">
-          Wersja <b id="aboutVersion"></b> · © 2025–2026 Krzysztof Jureczek ·
-          <a href="https://krzjur-oss.github.io/Dziennik-losowa-/" target="_blank" style="color:var(--accent2)">krzjur-oss.github.io</a>
+        <p style="margin-top:16px;color:var(--muted);font-size:0.88rem;border-top:1px solid var(--line);padding-top:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <span>
+            Wersja <b id="aboutVersion"></b> · © 2025–2026 Krzysztof Jureczek ·
+            <a href="https://krzjur-oss.github.io/Dziennik-losowa-/" target="_blank" style="color:var(--accent2)">krzjur-oss.github.io</a>
+          </span>
+          <button onclick="checkForUpdates()" style="
+            background:var(--accent2);
+            color:white;
+            border:none;
+            padding:6px 12px;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:0.8rem;
+            font-weight:600;
+          ">🔄 Sprawdź aktualizacje</button>
         </p>
       </div>
 
@@ -1662,6 +1674,83 @@ if (!lastSeen || lastSeen !== APP_VERSION) {
   }
 }
 
+// ── VERSION CHECK & AUTO-UPDATE ──
+const CURRENT_VERSION = APP_VERSION; // '2.0'
+const storedVersion = localStorage.getItem('appVersion');
+
+if (storedVersion && storedVersion !== CURRENT_VERSION) {
+  console.log(`🔄 Version update detected: ${storedVersion} → ${CURRENT_VERSION}`);
+  
+  // Clear old cache manually if SW update didn't trigger
+  if ('caches' in window) {
+    caches.keys().then(keys => {
+      keys.forEach(key => {
+        if (key !== `dziennik-v${CURRENT_VERSION}`) {
+          console.log(`🗑️ Deleting old cache: ${key}`);
+          caches.delete(key);
+        }
+      });
+    });
+  }
+  
+  // Show changelog notification
+  setTimeout(() => {
+    showVersionUpdateNotification(storedVersion, CURRENT_VERSION);
+  }, 1000);
+}
+
+// Save current version
+localStorage.setItem('appVersion', CURRENT_VERSION);
+
+// Show version update notification
+function showVersionUpdateNotification(oldVersion, newVersion) {
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--accent2) 0%, #2563eb 100%);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    z-index: 10000;
+    max-width: 90%;
+    animation: slideUp 0.3s ease-out;
+  `;
+  
+  notification.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-size: 1.5rem;">🎉</span>
+      <div style="flex: 1;">
+        <div style="font-weight: 600; margin-bottom: 4px;">Zaktualizowano do wersji ${newVersion}!</div>
+        <div style="font-size: 0.85rem; opacity: 0.9;">Kliknij "Aktualizacje" w menu, aby zobaczyć co nowego</div>
+      </div>
+      <button onclick="this.parentElement.parentElement.remove()" style="
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+      ">OK</button>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Auto-remove after 10 seconds
+  setTimeout(() => {
+    if (notification.parentElement) {
+      notification.style.transition = 'opacity 0.3s';
+      notification.style.opacity = '0';
+      setTimeout(() => notification.remove(), 300);
+    }
+  }, 10000);
+}
+
 // ── FIRST VISIT: auto-open tutorial ──
 if (!localStorage.getItem('dziennik_visited')) {
   localStorage.setItem('dziennik_visited', '1');
@@ -1670,20 +1759,40 @@ if (!localStorage.getItem('dziennik_visited')) {
 
 // ── SERVICE WORKER (PWA) ──
 if ('serviceWorker' in navigator) {
+  let refreshing = false;
+  
+  // Reload page when new SW takes control
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return;
+    refreshing = true;
+    console.log('🔄 Reloading page with new Service Worker...');
+    window.location.reload();
+  });
+
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
       .then(reg => {
         console.log('✅ Service Worker registered:', reg.scope);
         
-        // Check for updates
+        // Check for updates every 60 seconds
+        setInterval(() => {
+          reg.update();
+        }, 60000);
+        
+        // Handle updates
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing;
           console.log('🔄 Service Worker update found');
           
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('✨ New version available - refresh to update');
-              // Optionally show update notification to user
+              console.log('✨ New version available');
+              
+              // Show update notification
+              showUpdateNotification(() => {
+                // Tell new SW to skip waiting
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+              });
             }
           });
         });
@@ -1692,6 +1801,114 @@ if ('serviceWorker' in navigator) {
         console.error('❌ Service Worker registration failed:', err);
       });
   });
+}
+
+// Show update notification with reload button
+function showUpdateNotification(onUpdate) {
+  // Check if notification already exists
+  if (document.getElementById('updateNotification')) return;
+  
+  const notification = document.createElement('div');
+  notification.id = 'updateNotification';
+  notification.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent2);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    animation: slideUp 0.3s ease-out;
+    max-width: 90%;
+  `;
+  
+  notification.innerHTML = `
+    <span style="flex: 1;">🎉 Nowa wersja aplikacji jest dostępna!</span>
+    <button onclick="updateApp()" style="
+      background: white;
+      color: var(--accent2);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+    ">Aktualizuj</button>
+  `;
+  
+  // Add animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideUp {
+      from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  document.body.appendChild(notification);
+  
+  // Store callback
+  window._updateCallback = onUpdate;
+}
+
+// Update app function (called from notification button)
+function updateApp() {
+  const notification = document.getElementById('updateNotification');
+  if (notification) {
+    notification.style.transition = 'opacity 0.3s';
+    notification.style.opacity = '0';
+    setTimeout(() => notification.remove(), 300);
+  }
+  
+  if (window._updateCallback) {
+    window._updateCallback();
+  }
+}
+
+// Check for updates manually
+function checkForUpdates() {
+  const btn = event.target;
+  const originalText = btn.textContent;
+  btn.textContent = '⏳ Sprawdzam...';
+  btn.disabled = true;
+  
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistration('./sw.js')
+      .then(reg => {
+        if (reg) {
+          return reg.update();
+        } else {
+          throw new Error('Service Worker nie jest zarejestrowany');
+        }
+      })
+      .then(() => {
+        setTimeout(() => {
+          btn.textContent = '✅ Aktualna wersja';
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+          }, 2000);
+        }, 1000);
+      })
+      .catch(err => {
+        console.error('Update check failed:', err);
+        btn.textContent = '❌ Błąd';
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }, 2000);
+      });
+  } else {
+    // No Service Worker - just reload
+    window.location.reload(true);
+  }
 }
 </script>
 </body>
