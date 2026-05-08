@@ -1,31 +1,33 @@
-Copyright (c) 2025–2026 Krzysztof Jureczek. All rights reserved.
+Copyright (c) 2025–2026 Krzysztof Jureczek. Wszelkie prawa zastrzeżone.
 
-PROJECT NAME: Dziennik Losowań
-AUTHOR: Krzysztof Jureczek
+NAZWA PROJEKTU: Dziennik Losowań
+AUTOR: Krzysztof Jureczek
 
-TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION:
+WARUNKI UŻYTKOWANIA, REPRODUKCJI I DYSTRYBUCJI:
 
-1. Ownership: All visual interfaces, graphics, design, compilation, information,
-   computer code (including source code or object code), products, software,
-   services, and all other elements of the Dziennik Losowań application provided
-   by the Author are protected by intellectual property and proprietary rights.
+1. Własność: Wszystkie elementy interfejsu wizualnego, grafiki, projekt, kompilacja,
+   informacje, kod komputerowy (w tym kod źródłowy lub kod obiektowy), produkty,
+   oprogramowanie, usługi i wszystkie inne elementy aplikacji Dziennik Losowań
+   dostarczone przez Autora są chronione prawami własności intelektualnej
+   i prawami zastrzeżonymi.
 
-2. Restriction of Use: Permission is hereby NOT granted to any person obtaining
-   a copy of this software and associated documentation files to deal in the
-   Software without restriction. This includes, without limitation, the rights
-   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-   copies of the Software.
+2. Ograniczenie użytkowania: Niniejszym NIE udziela się zgody żadnej osobie
+   otrzymującej kopię tego oprogramowania i powiązanych plików dokumentacji
+   na korzystanie z Oprogramowania bez ograniczeń. Obejmuje to, bez ograniczeń,
+   prawa do używania, kopiowania, modyfikowania, łączenia, publikowania,
+   dystrybucji, sublicencjonowania i/lub sprzedaży kopii Oprogramowania.
 
-3. Personal Use: You may access and use the application strictly for its
-   intended purpose (random student selection and attendance tracking during
-   school lessons). Any reverse engineering or unauthorized reproduction of
-   the source code is strictly prohibited.
+3. Użytek osobisty: Możesz uzyskać dostęp do aplikacji i korzystać z niej
+   wyłącznie zgodnie z jej przeznaczeniem (losowe wybieranie uczniów i rejestrowanie
+   obecności podczas lekcji szkolnych). Jakiekolwiek inżynierowanie wsteczne
+   lub nieautoryzowana reprodukcja kodu źródłowego są surowo zabronione.
 
-4. No Warranty: THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-   IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE.
+4. Brak gwarancji: OPROGRAMOWANIE DOSTARCZANE JEST „TAKIM, JAKIM JEST" (AS IS),
+   BEZ JAKIEJKOLWIEK GWARANCJI, WYRAŹNEJ LUB DOROZUMIANEJ, W TYM BEZ GWARANCJI
+   PRZYDATNOŚCI HANDLOWEJ, PRZYDATNOŚCI DO OKREŚLONEGO CELU ORAZ NIENARUSZANIA
+   PRAW. AUTOR NIE PONOSI ODPOWIEDZIALNOŚCI ZA JAKIEKOLWIEK ROSZCZENIA, SZKODY
+   LUB INNE ZOBOWIĄZANIA, CZY TO W RAMACH UMOWY, CZYNU NIEDOZWOLONEGO, CZY INACZEJ,
+   WYNIKAJĄCE Z UŻYTKOWANIA OPROGRAMOWANIA LUB ZWIĄZANE Z NIM.
 
-For inquiries regarding commercial use or licensing, please contact the Author.
+W sprawach dotyczących użytku komercyjnego lub licencjonowania prosimy o kontakt
+z Autorem.
