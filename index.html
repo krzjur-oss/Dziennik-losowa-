@@ -504,13 +504,15 @@ body {
       <p>Kliknij przycisk <b>＋</b> na pasku kart, wpisz nazwę klasy (np. <i>3B</i>) lub wiele nazw oddzielonych przecinkami (np. <i>3B, 2A, Fizyka 1</i>) i potwierdź. Każda klasa ma własną pulę numerów i historię.</p>
 
       <h3 style="font-size:1.05rem;margin:16px 0 8px;color:var(--accent)">2. Konfiguracja puli uczniów</h3>
-      <p>Domyślnie w puli jest 30 numerów. Klikaj numery, aby je włączać/wyłączać:</p>
+      <p>Domyślnie w puli jest 30 numerów. Możesz oznaczyć każdego ucznia na różne sposoby:</p>
       <ul style="margin:8px 0 8px 20px">
-        <li><span style="color:var(--green)">●</span> <b>Zielony</b> — aktywny w puli</li>
+        <li><span style="color:var(--green)">●</span> <b>Zielony</b> — aktywny w puli (pojedyncze kliknięcie włącza/wyłącza)</li>
+        <li><span style="color:var(--accent2)">●</span> <b>Niebieski z ✋</b> — zgłosił się sam (<b>podwójne kliknięcie</b>, nie będzie losowany)</li>
+        <li><span style="color:var(--accent)">●</span> <b>Czerwony z ⊘</b> — nieobecny (prawy przycisk lub długie przytrzymanie)</li>
         <li><span style="color:var(--drawn)">●</span> <b>Złoty</b> — już wylosowany (zniknie po resecie kolejki)</li>
-        <li><span style="color:var(--muted)">●</span> <b>Szary</b> — wykluczony z losowania</li>
+        <li><span style="color:var(--muted)">●</span> <b>Szary</b> — wykluczony na stałe z losowania</li>
       </ul>
-      <p>Użyj przycisków <b>Zaznacz wszystkie</b> / <b>Odznacz wszystkie</b> dla szybkiej zmiany.</p>
+      <p>Użyj przycisków w menu <b>⚙️ Akcje klasy</b> dla szybkich zmian (Zaznacz wszystkie, Nieparzyste, Parzyste).</p>
 
       <h3 style="font-size:1.05rem;margin:16px 0 8px;color:var(--accent)">3. Losowanie</h3>
       <p>Naciśnij duży przycisk <b>„Losuj dwie liczby"</b>. Aplikacja wylosuje 2 numery z puli — każdy uczeń jest losowany tylko raz na rundę.</p>
@@ -580,6 +582,14 @@ body {
           <td style="padding:6px 0">Cofnij ostatnie losowanie</td>
         </tr>
         <tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:6px 0"><b>Pojedyncze kliknięcie</b></td>
+          <td style="padding:6px 0">Włącz/wyłącz numer z puli</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:6px 0"><b>Podwójne kliknięcie</b></td>
+          <td style="padding:6px 0">Oznacz ucznia jako zgłoszonego (nie będzie losowany)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--line)">
           <td style="padding:6px 0"><b>Prawy klik</b></td>
           <td style="padding:6px 0">Oznacz ucznia jako nieobecnego</td>
         </tr>
@@ -591,9 +601,11 @@ body {
 
       <h3 style="font-size:1rem;margin:0 0 8px;color:var(--accent)">Stany numerów</h3>
       <ul style="margin:0 0 16px 20px">
-        <li><span style="color:var(--green)">●</span> <b>W puli</b> — numer uczestniczy w losowaniu</li>
+        <li><span style="color:var(--green)">●</span> <b>Aktywny</b> — numer uczestniczy w losowaniu</li>
+        <li><span style="color:var(--accent2)">●✋</span> <b>Zgłosił się</b> — uczeń sam się zgłosił, nie będzie losowany</li>
+        <li><span style="color:var(--accent)">●⊘</span> <b>Nieobecny</b> — tymczasowo wykluczony, nie będzie losowany</li>
         <li><span style="color:var(--drawn)">●</span> <b>Wylosowany</b> — już wybrany w tej rundzie</li>
-        <li><span style="color:var(--muted)">●</span> <b>Wykluczony</b> — nie bierze udziału w losowaniu</li>
+        <li><span style="color:var(--muted)">●</span> <b>Wykluczony</b> — na stałe wyłączony z puli</li>
       </ul>
 
       <h3 style="font-size:1rem;margin:0 0 8px;color:var(--accent)">Jak działa kolejka?</h3>
@@ -639,6 +651,8 @@ body {
           <li>Konfigurowalny zakres numerów (1–N) dla każdej klasy</li>
           <li>Tryb nieobecności — tymczasowe wykluczenie uczniów z losowania</li>
           <li>Przycisk „✅ Wszyscy wrócili" — reset nieobecności jednym kliknięciem</li>
+          <li><b style="color:var(--accent2)">🆕 Zgłaszanie się — podwójne kliknięcie oznacza ucznia który sam się zgłosił (nie będzie losowany)</b></li>
+          <li><b style="color:var(--accent2)">🆕 Przycisk „🙋 Wyczyść zgłoszonych" — reset wszystkich zgłoszeń jednym kliknięciem</b></li>
           <li>Losowanie bez powtórzeń — każdy numer tylko raz na rundę</li>
           <li>Elastyczne losowanie przy niepełnej puli (brakujące pola → „-")</li>
           <li>Cofanie ostatniego losowania (↩️)</li>
@@ -647,9 +661,19 @@ body {
           <li>Eksport i import danych JSON</li>
         </ul>
 
+        <h3 style="font-size:1rem;color:var(--accent2);margin:14px 0 6px">🆕 Oznaczanie uczniów (v2.0)</h3>
+        <p style="margin-bottom:8px">Każdy numer może mieć jeden z pięciu stanów:</p>
+        <ul style="margin:0 0 10px 20px;font-size:0.92rem">
+          <li>🟢 <b>Aktywny</b> — pojedyncze kliknięcie (włącz/wyłącz), może być wylosowany</li>
+          <li>🔵 <b>Zgłosił się</b> — <b>podwójne kliknięcie</b>, nie będzie losowany, emoji ✋</li>
+          <li>🔴 <b>Nieobecny</b> — prawy przycisk lub długie przytrzymanie, nie będzie losowany, emoji ⊘</li>
+          <li>🟡 <b>Wylosowany</b> — automatycznie po losowaniu, nie będzie losowany ponownie (dziś)</li>
+          <li>⚫ <b>Wykluczony</b> — wyłączony na stałe, nie będzie losowany</li>
+        </ul>
+
         <h3 style="font-size:1rem;color:var(--accent);margin:14px 0 6px">📱 Instalacja na Androidzie (PWA)</h3>
         <ol style="margin:0 0 10px 20px">
-          <li>Otwórz <b>Chrome</b> na tablecie lub telefonie</li>
+          <li>Otwórz <b>Chrome</b> lub <b>Samsung Internet</b> na tablecie lub telefonie</li>
           <li>Naciśnij menu <b>⋮</b> → <b>„Dodaj do ekranu głównego"</b></li>
           <li>Od tej chwili działa <b>offline</b>, bez paska przeglądarki</li>
         </ol>
@@ -658,7 +682,7 @@ body {
         </p>
 
         <h3 style="font-size:1rem;color:var(--accent);margin:14px 0 6px">🔒 Prywatność</h3>
-        <p>Wszystkie dane przechowywane są <b>wyłącznie lokalnie</b> w przeglądarce (<code>localStorage</code>). Żadne dane nie są wysyłane na serwer. Aplikacja nie używa plików cookie ani narzędzi analitycznych.</p>
+        <p>Wszystkie dane (klasy, losowania, nieobecności, zgłoszenia) przechowywane są <b>wyłącznie lokalnie</b> w przeglądarce (<code>localStorage</code>). Żadne dane nie są wysyłane na serwer. Aplikacja nie używa plików cookie ani narzędzi analitycznych.</p>
 
         <h3 style="font-size:1rem;color:var(--accent);margin:14px 0 6px">🛠️ Technologie</h3>
         <p>Vanilla HTML / CSS / JavaScript — zero zewnętrznych zależności. PWA z Service Workerem i manifestem.</p>
@@ -710,7 +734,7 @@ body {
           </tr>
           <tr>
             <td style="padding:5px 8px;border:1px solid var(--line)"><code>dziennik_v5</code></td>
-            <td style="padding:5px 8px;border:1px solid var(--line)">Pełny stan (klasy, pule, historia, nieobecności)</td>
+            <td style="padding:5px 8px;border:1px solid var(--line)">Pełny stan (klasy, pule, historia, nieobecności, zgłoszenia)</td>
           </tr>
           <tr>
             <td style="padding:5px 8px;border:1px solid var(--line)"><code>dziennik_backup</code></td>
@@ -765,14 +789,19 @@ const UPDATES = [
   {
     version: '2.0',
     date: '2026-05-07',
-    title: 'Zgłaszanie się do odpowiedzi',
+    title: 'Zgłaszanie się do odpowiedzi + Naprawa PWA dla Samsungów',
     changes: [
-      'Dodano możliwość oznaczania uczniów którzy sami zgłosili się do odpowiedzi — podwójne kliknięcie na numer',
-      'Uczniowie zgłoszeni są wizualnie wyróżnieni (niebieskie tło, emoji ✋) i wykluczeni z losowania',
-      'Licznik zgłoszonych w statystykach puli klasy',
-      'Przycisk „🙋 Wyczyść zgłoszonych" w menu akcji klasy (pojawia się gdy ktoś jest zgłoszony)',
-      'Zgłoszeni są automatycznie usuwani przy resetowaniu puli (Odznacz wszystkie, Parzyste, Nieparzyste)',
-      'Nie można oznaczyć jako zgłoszonego ucznia który jest nieobecny'
+      '🆕 Dodano możliwość oznaczania uczniów którzy sami zgłosili się do odpowiedzi — podwójne kliknięcie na numer',
+      '🔵 Uczniowie zgłoszeni są wizualnie wyróżnieni (niebieskie tło, emoji ✋) i wykluczeni z losowania',
+      '📊 Licznik zgłoszonych w statystykach puli klasy',
+      '🙋 Przycisk „Wyczyść zgłoszonych" w menu akcji klasy (pojawia się gdy ktoś jest zgłoszony)',
+      '🔄 Zgłoszeni są automatycznie usuwani przy resetowaniu puli (Odznacz wszystkie, Parzyste, Nieparzyste)',
+      '🚫 Nie można oznaczyć jako zgłoszonego ucznia który jest nieobecny',
+      '🔧 NAPRAWA PWA: Zmieniono wszystkie ścieżki na względne (./) — aplikacja działa teraz po instalacji na Samsungach',
+      '📱 Dodano scope do manifest.json dla lepszej kompatybilności z Samsung Internet',
+      '💾 Ikony są teraz cache\'owane w Service Worker — szybsze ładowanie offline',
+      '⚡ Lepszy error handling w Service Worker — aplikacja działa stabilniej offline',
+      '🔄 Zaktualizowano wersję cache (v2.0) — starsza wersja jest automatycznie usuwana'
     ]
   },
   {

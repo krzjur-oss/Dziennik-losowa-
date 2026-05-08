@@ -1,4 +1,4 @@
-# 🎉 Dziennik Losowania v2.0 - Zgłaszanie się do odpowiedzi
+# 🎉 Dziennik Losowania v2.0 - Zgłaszanie się do odpowiedzi + Naprawa PWA
 
 ## 🆕 Nowe funkcje
 
@@ -151,6 +151,7 @@ const active = cls.pool
 
 ## 📋 Pełna lista zmian v2.0
 
+### 🆕 Nowa funkcja - Zgłaszanie się:
 1. ✅ Dodano `toggleVolunteered(cid, n)` - przełączanie stanu zgłoszony/nie
 2. ✅ Dodano `clearVolunteered(cid)` - czyszczenie listy zgłoszonych
 3. ✅ Zaktualizowano `buildClassView()` - renderowanie z uwzględnieniem volunteered
@@ -163,6 +164,29 @@ const active = cls.pool
 10. ✅ Dodano przycisk "Wyczyść zgłoszonych" w menu akcji
 11. ✅ Zaktualizowano `loadState()` i import - inicjalizacja `volunteered: []`
 12. ✅ Dodano wpis do tablicy UPDATES
+
+### 🔧 Naprawa PWA dla Samsungów:
+13. ✅ Zmieniono `start_url: "/index.html"` na `start_url: "./"` w manifest.json
+14. ✅ Dodano `scope: "./"` w manifest.json
+15. ✅ Zmieniono ścieżki ikon na względne: `./icon-192.png`, `./icon-512.png`
+16. ✅ Zaktualizowano Service Worker - wszystkie ścieżki na względne
+17. ✅ Dodano ikony do cache w sw.js (`./icon-192.png`, `./icon-512.png`)
+18. ✅ Zmieniono wersję cache z `dziennik-v1` na `dziennik-v2.0`
+19. ✅ Dodano error handling w fetch listener (fallback offline page)
+20. ✅ Dodano logging dla debugowania Service Workera
+21. ✅ Dodano cache dla Google Fonts
+22. ✅ Poprawiono rejestrację Service Workera na `./sw.js`
+23. ✅ Dodano update detection w Service Worker registration
+24. ✅ Zaktualizowano link do manifestu na `./manifest.json`
+
+### 📝 Dokumentacja:
+25. ✅ Zaktualizowano README w modalu "O aplikacji"
+26. ✅ Zaktualizowano samouczek (Tutorial)
+27. ✅ Zaktualizowano modal pomocy (Help)
+28. ✅ Zaktualizowano regulamin (localStorage - dodano "zgłoszenia")
+29. ✅ Rozszerzono wpis v2.0 w tablicy UPDATES
+30. ✅ Zaktualizowano README.md
+31. ✅ Utworzono dokumentację naprawy PWA dla Samsungów
 
 ---
 

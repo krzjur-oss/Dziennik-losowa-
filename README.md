@@ -131,13 +131,18 @@ Wszystkie dane (klasy, pule numerów, historia losowań, nieobecności, zgłosze
 
 ## 📋 Historia wersji
 
-### v2.0 (2026-05-07) — Zgłaszanie się do odpowiedzi
+### v2.0 (2026-05-07) — Zgłaszanie się do odpowiedzi + Naprawa PWA dla Samsungów
 - ✋ Oznaczanie uczniów którzy sami się zgłosili (podwójne kliknięcie)
 - 🔵 Wizualne wyróżnienie zgłoszonych (niebieski kolor, emoji ✋)
 - 🚫 Automatyczne wykluczenie zgłoszonych z losowania
 - 📊 Licznik zgłoszonych w statystykach puli
 - 🙋 Przycisk „Wyczyść zgłoszonych" w menu akcji klasy
 - 🔄 Auto-czyszczenie przy resetowaniu puli (Odznacz wszystkie, Parzyste, Nieparzyste)
+- 🔧 **NAPRAWA PWA:** Zmieniono wszystkie ścieżki na względne (./) — aplikacja działa teraz po instalacji na Samsungach
+- 📱 Dodano scope do manifest.json dla lepszej kompatybilności z Samsung Internet
+- 💾 Ikony są teraz cache'owane w Service Worker — szybsze ładowanie offline
+- ⚡ Lepszy error handling w Service Worker — aplikacja działa stabilniej offline
+- 🔄 Zaktualizowano wersję cache (v2.0) — starsza wersja jest automatycznie usuwana
 
 ### v1.9 (2026-04-17) — Kompaktowy interfejs
 - ☰ Hamburger menu — wszystkie opcje nagłówka w jednym miejscu
